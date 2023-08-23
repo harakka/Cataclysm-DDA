@@ -86,5 +86,8 @@
     "astyle.astylerc": "${workspaceRoot}/.astylerc",
     "files.associations": {
         "vector": "cpp"
+    },
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
     }
 }
