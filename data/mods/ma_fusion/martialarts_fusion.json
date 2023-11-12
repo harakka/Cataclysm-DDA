@@ -1,0 +1,29 @@
+[
+  {
+    "type": "martial_art",
+    "id": "style_none",
+    "name": { "str": "Fusion" },
+    "description": "TODO MA description",
+    "initiate": [ "You TODO.", "%s TODOs." ],
+    "priority": 1,
+    "learn_difficulty": 5,
+    "arm_block": 0,
+    "techniques": [ "tec_fusion_test" ],
+    "allow_all_weapons": true
+  },
+  {
+    "type": "technique",
+    "id": "tec_fusion_test",
+    "name": "MA fusion test technique",
+    "melee_allowed": true,
+    "crit_ok": true,
+    "unarmed_allowed": true,
+    "condition": {
+      "compare_num": [ { "u_val": "proficiency", "proficiency_id": "prof_unarmed_familiar", "format": "percent" }, ">=", { "const": 100 } ]
+    },
+    "condition_desc": "Triggering tied to prof_unarmed_familiar",
+    "messages": [ "You do the cool thing to %s!", "<npcname> sends %s reeling!" ],
+    "description": "Does cool thing",
+    "attack_vectors": [ "HEAD" ]
+  }
+]

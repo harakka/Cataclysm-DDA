@@ -1,0 +1,12 @@
+[
+  {
+    "type": "MOD_INFO",
+    "id": "MARTIAL_ARTS_FUSION",
+    "name": "Martial arts fusion",
+    "authors": [ "harakka" ],
+    "maintainers": [ "harakka" ],
+    "description": "One martial art to rule them all.",
+    "category": "misc_additions",
+    "dependencies": [ "dda" ]
+  }
+]

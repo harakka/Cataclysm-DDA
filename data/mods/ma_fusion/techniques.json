@@ -1,0 +1,1496 @@
+[
+  {
+    "type": "technique",
+    "id": "tec_none",
+    "name": "Not a technique at all",
+    "dummy": true
+  },
+  {
+    "type": "technique",
+    "id": "WBLOCK_1",
+    "name": "Block",
+    "dummy": true,
+    "mult_bonuses": [ { "stat": "movecost", "scale": 0.0 } ],
+    "messages": [ "You block %s!", "<npcname> blocks %s!" ],
+    "description": "Medium blocking ability"
+  },
+  {
+    "type": "technique",
+    "id": "WBLOCK_2",
+    "name": "Parry",
+    "dummy": true,
+    "mult_bonuses": [ { "stat": "movecost", "scale": 0.0 } ],
+    "messages": [ "You parry %s!", "<npcname> parries %s!" ],
+    "description": "High blocking ability"
+  },
+  {
+    "type": "technique",
+    "id": "WBLOCK_3",
+    "name": "Shield",
+    "dummy": true,
+    "mult_bonuses": [ { "stat": "movecost", "scale": 0.0 } ],
+    "messages": [ "You shield against %s!", "<npcname> shields against %s!" ],
+    "description": "Very high blocking ability"
+  },
+  {
+    "type": "technique",
+    "id": "DEF_DISARM",
+    "name": "Disarm",
+    "melee_allowed": true,
+    "disarms": true,
+    "skill_requirements": [ { "name": "melee", "level": 4 } ],
+    "description": "Unwield target's weapon, min 4 melee",
+    "tech_effects": [
+      {
+        "id": "disarmed",
+        "chance": 100,
+        "duration": 400,
+        "on_damage": true,
+        "message": "The weapon of %s has been forced out ot their hands!"
+      }
+    ],
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "GRAB",
+    "name": "",
+    "//": "not implemented -> empty name",
+    "messages": [ "You grab %s!", "<npcname> grabs %s!" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_feint",
+    "name": "Feint",
+    "melee_allowed": true,
+    "defensive": true,
+    "miss_recovery": true,
+    "messages": [ "You feint at %s!", "<npcname> feints at %s!" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_break",
+    "name": "Grab Break",
+    "melee_allowed": true,
+    "defensive": true,
+    "grab_break": true,
+    "messages": [
+      "You were almost grabbed by %s, but you break its grab!",
+      "<npcname> was almost grabbed by %s, but they break its grab!"
+    ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_aikido_blockthrow",
+    "name": "Counter Throw (block)",
+    "messages": [ "You smoothly throw %s!", "<npcname> blocks and smoothly throws %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 2 } ],
+    "unarmed_allowed": true,
+    "melee_allowed": true,
+    "unarmed_weapons_allowed": false,
+    "required_buffs_all": [ "buff_aikido_onblock" ],
+    "crit_ok": true,
+    "//condition": "Humanoids of similar size and no flying",
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "math": [ "n_val('size')", "!=", "1" ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "or": [ { "npc_bodytype": "human" }, { "npc_bodytype": "angel" } ] },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] },
+        {
+          "or": [
+            {
+              "and": [
+                { "npc_has_flag": "GRAB_FILTER" },
+                { "u_has_flag": "GRAB" },
+                {
+                  "roll_contested": { "math": [ "u_val('strength')" ] },
+                  "die_size": 20,
+                  "difficulty": { "math": [ "n_val('grab_strength')" ] }
+                }
+              ]
+            },
+            { "not": { "and": [ { "npc_has_flag": "GRAB_FILTER" }, { "u_has_flag": "GRAB" } ] } }
+          ]
+        }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>similar or smaller</info> size incapable of flight, may fail on targets <info>grabbing you</info>",
+    "down_dur": 1,
+    "knockback_dist": 1,
+    "mult_bonuses": [ { "stat": "movecost", "scale": 0.7 } ],
+    "attack_vectors": [ "THROW" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_aikido_dodgethrow",
+    "name": "Counter Throw (dodge)",
+    "messages": [ "You smoothly throw %s!", "<npcname> dodges and smoothly throws %s!" ],
+    "unarmed_allowed": true,
+    "melee_allowed": true,
+    "unarmed_weapons_allowed": false,
+    "required_buffs_all": [ "buff_aikido_ondodge" ],
+    "crit_ok": true,
+    "//condition": "Humanoids of similar size and no flying",
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "math": [ "n_val('size')", "!=", "1" ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "or": [ { "npc_bodytype": "human" }, { "npc_bodytype": "angel" } ] },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] },
+        {
+          "or": [
+            {
+              "and": [
+                { "npc_has_flag": "GRAB_FILTER" },
+                { "u_has_flag": "GRAB" },
+                {
+                  "roll_contested": { "math": [ "u_val('strength')" ] },
+                  "die_size": 20,
+                  "difficulty": { "math": [ "n_val('grab_strength')" ] }
+                }
+              ]
+            },
+            { "not": { "and": [ { "npc_has_flag": "GRAB_FILTER" }, { "u_has_flag": "GRAB" } ] } }
+          ]
+        }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>similar or smaller</info> size incapable of flight, may fail on targets <info>grabbing you</info>",
+    "down_dur": 1,
+    "knockback_dist": 1,
+    "mult_bonuses": [ { "stat": "movecost", "scale": 0.7 } ],
+    "attack_vectors": [ "THROW" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_aikido_blockdisarm",
+    "name": "Disarming Throw (block)",
+    "messages": [ "You smoothly disarm %s!", "<npcname> blocks and smoothly disarms %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 4 } ],
+    "unarmed_allowed": true,
+    "melee_allowed": true,
+    "unarmed_weapons_allowed": false,
+    "required_buffs_all": [ "buff_aikido_onblock" ],
+    "crit_ok": true,
+    "disarms": true,
+    "tech_effects": [
+      {
+        "id": "disarmed",
+        "chance": 100,
+        "duration": 400,
+        "on_damage": true,
+        "message": "The weapon of %s has been forced out ot their hands!"
+      }
+    ],
+    "//condition": "Humanoids of similar size and no flying",
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "math": [ "n_val('size')", "!=", "1" ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "or": [ { "npc_bodytype": "human" }, { "npc_bodytype": "angel" } ] },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] },
+        {
+          "or": [
+            {
+              "and": [
+                { "npc_has_flag": "GRAB_FILTER" },
+                { "u_has_flag": "GRAB" },
+                {
+                  "roll_contested": { "math": [ "u_val('strength')" ] },
+                  "die_size": 20,
+                  "difficulty": { "math": [ "n_val('grab_strength')" ] }
+                }
+              ]
+            },
+            { "not": { "and": [ { "npc_has_flag": "GRAB_FILTER" }, { "u_has_flag": "GRAB" } ] } }
+          ]
+        }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>similar or smaller</info> size incapable of flight, may fail on targets <info>grabbing you</info>",
+    "down_dur": 1,
+    "knockback_dist": 1,
+    "mult_bonuses": [ { "stat": "movecost", "scale": 0.7 } ],
+    "attack_vectors": [ "THROW" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_aikido_dodgedisarm",
+    "name": "Disarming Throw (dodge)",
+    "messages": [ "You smoothly disarm %s!", "<npcname> dodges and smoothly disarms %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 4 } ],
+    "unarmed_allowed": true,
+    "melee_allowed": true,
+    "unarmed_weapons_allowed": false,
+    "required_buffs_all": [ "buff_aikido_ondodge" ],
+    "crit_ok": true,
+    "disarms": true,
+    "tech_effects": [
+      {
+        "id": "disarmed",
+        "chance": 100,
+        "duration": 400,
+        "on_damage": true,
+        "message": "The weapon of %s has been forced out ot their hands!"
+      }
+    ],
+    "//condition": "Humanoids of similar size and no flying",
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "math": [ "n_val('size')", "!=", "1" ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "or": [ { "npc_bodytype": "human" }, { "npc_bodytype": "angel" } ] },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] },
+        {
+          "or": [
+            {
+              "and": [
+                { "npc_has_flag": "GRAB_FILTER" },
+                { "u_has_flag": "GRAB" },
+                {
+                  "roll_contested": { "math": [ "u_val('strength')" ] },
+                  "die_size": 20,
+                  "difficulty": { "math": [ "n_val('grab_strength')" ] }
+                }
+              ]
+            },
+            { "not": { "and": [ { "npc_has_flag": "GRAB_FILTER" }, { "u_has_flag": "GRAB" } ] } }
+          ]
+        }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>similar or smaller</info> size incapable of flight, may fail on targets <info>grabbing you</info>",
+    "down_dur": 1,
+    "knockback_dist": 1,
+    "mult_bonuses": [ { "stat": "movecost", "scale": 0.7 } ],
+    "attack_vectors": [ "THROW" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_aikido_break",
+    "name": "Grab Break",
+    "messages": [
+      "You were almost grabbed by %s, but you smoothly break free!",
+      "<npcname> was almost grabbed by %s, but they smoothly break free!"
+    ],
+    "skill_requirements": [ { "name": "unarmed", "level": 3 } ],
+    "unarmed_allowed": true,
+    "melee_allowed": true,
+    "unarmed_weapons_allowed": false,
+    "defensive": true,
+    "grab_break": true
+  },
+  {
+    "type": "technique",
+    "id": "tec_boxing_cross",
+    "name": "Cross",
+    "messages": [ "You throw a heavy cross at %s!", "<npcname> throws a cross at %s!" ],
+    "unarmed_allowed": true,
+    "mult_bonuses": [ { "stat": "damage", "type": "bash", "scale": 1.2 } ],
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_boxing_counter",
+    "name": "Cross Counter",
+    "messages": [ "You cross-counter %s!", "<npcname> throws a perfect counter at %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 5 } ],
+    "unarmed_allowed": true,
+    "required_buffs_all": [ "buff_boxing_ondodge" ],
+    "weighting": 2,
+    "crit_tec": true,
+    "knockback_dist": 1,
+    "knockback_spread": 1,
+    "stun_dur": 1,
+    "//condition": "Humanoids of similar size and no flying",
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "or": [ { "npc_bodytype": "human" }, { "npc_bodytype": "angel" } ] },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>similar or smaller</info> size incapable of flight",
+    "down_dur": 1,
+    "mult_bonuses": [ { "stat": "damage", "type": "bash", "scale": 1.5 } ],
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_boxing_rapid",
+    "name": "Jab",
+    "messages": [ "You quickly jab %s!", "<npcname> quickly jabs at %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 2 } ],
+    "unarmed_allowed": true,
+    "mult_bonuses": [
+      { "stat": "movecost", "scale": 0.5 },
+      { "stat": "damage", "type": "bash", "scale": 0.66 },
+      { "stat": "damage", "type": "cut", "scale": 0.66 },
+      { "stat": "damage", "type": "stab", "scale": 0.66 }
+    ],
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_boxing_upper",
+    "name": "Uppercut",
+    "messages": [ "You uppercut %s!", "<npcname> uppercuts %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 4 } ],
+    "unarmed_allowed": true,
+    "crit_tec": true,
+    "//condition": "Things of similar size in both directions that keep their heads high",
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "math": [ "n_val('size') - 1", "<=", "n_val('size')" ] },
+        { "not": { "npc_has_effect": "stunned" } },
+        {
+          "or": [
+            { "npc_bodytype": "human" },
+            { "npc_bodytype": "mi-go" },
+            { "npc_bodytype": "kangoroo" },
+            { "npc_bodytype": "horse" },
+            { "npc_bodytype": "bear" },
+            { "npc_bodytype": "angel" }
+          ]
+        }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-stunned</info> target of <info>similar</info> size incapable of flight",
+    "stun_dur": 1,
+    "mult_bonuses": [ { "stat": "damage", "type": "bash", "scale": 1.4 } ],
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_brawl_break_melee",
+    "name": "Grab Break",
+    "messages": [
+      "You were almost grabbed by %s, but you force yourself free!",
+      "<npcname> was almost grabbed by %s, but they break free!"
+    ],
+    "skill_requirements": [ { "name": "melee", "level": 6 } ],
+    "melee_allowed": true,
+    "defensive": true,
+    "grab_break": true
+  },
+  {
+    "type": "technique",
+    "id": "tec_brawl_break_unarmed",
+    "name": "Grab Break",
+    "messages": [
+      "You were almost grabbed by %s, but you force yourself free!",
+      "<npcname> was almost grabbed by %s, but they break free!"
+    ],
+    "skill_requirements": [ { "name": "unarmed", "level": 6 } ],
+    "unarmed_allowed": true,
+    "defensive": true,
+    "grab_break": true
+  },
+  {
+    "type": "technique",
+    "id": "tec_brawl_feint_melee",
+    "name": "Feint",
+    "messages": [ "You fake a strike at %s!", "<npcname> fakes a strike at %s!" ],
+    "skill_requirements": [ { "name": "melee", "level": 3 } ],
+    "melee_allowed": true,
+    "defensive": true,
+    "miss_recovery": true
+  },
+  {
+    "type": "technique",
+    "id": "tec_brawl_feint_unarmed",
+    "name": "Feint",
+    "messages": [ "You fake a strike at %s!", "<npcname> fakes a strike at %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 3 } ],
+    "unarmed_allowed": true,
+    "defensive": true,
+    "miss_recovery": true
+  },
+  {
+    "type": "technique",
+    "id": "tec_brawl_disarm_melee",
+    "name": "Disarm",
+    "messages": [ "You knock %s's weapon away!", "<npcname> knock %s's weapon away!" ],
+    "skill_requirements": [ { "name": "melee", "level": 6 } ],
+    "melee_allowed": true,
+    "disarms": true,
+    "tech_effects": [
+      {
+        "id": "disarmed",
+        "chance": 100,
+        "duration": 400,
+        "on_damage": true,
+        "message": "The weapon of %s has been forced out ot their hands!"
+      }
+    ],
+    "attack_vectors": [ "WEAPON" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_brawl_disarm_unarmed",
+    "name": "Disarm",
+    "messages": [ "You knock %s's weapon away!", "<npcname> knock %s's weapon away!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 6 } ],
+    "unarmed_allowed": true,
+    "disarms": true,
+    "tech_effects": [
+      {
+        "id": "disarmed",
+        "chance": 100,
+        "duration": 400,
+        "on_damage": true,
+        "message": "The weapon of %s has been forced out ot their hands!"
+      }
+    ],
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_brawl_power",
+    "name": "Power Hit",
+    "messages": [ "You send %s reeling!", "<npcname> sends %s reeling!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 4 } ],
+    "unarmed_allowed": true,
+    "crit_tec": true,
+    "knockback_dist": 1,
+    "stun_dur": 1,
+    "//condition": "Similar size and no flying or blobs",
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size')", ">=", "n_val('size')" ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "not": { "npc_has_effect": "stunned" } },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed and non-stunned</info> target of <info>similar or smaller</info> size incapable of flight",
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_brawl_trip",
+    "name": "Trip",
+    "messages": [ "You trip %s!", "<npcname> trips %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 5 } ],
+    "unarmed_allowed": true,
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "math": [ "u_val('size') - 1", "<=", "n_val('size')" ] },
+        { "or": [ { "npc_bodytype": "angel" }, { "npc_bodytype": "human" } ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>similar</info> size incapable of flight",
+    "down_dur": 1,
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_capoeira_feint",
+    "name": "Feint",
+    "messages": [ "You fake a kick at %s!", "<npcname> fakes a kick at %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 3 } ],
+    "unarmed_allowed": true,
+    "defensive": true,
+    "miss_recovery": true
+  },
+  {
+    "type": "technique",
+    "id": "tec_capoeira_pushkick",
+    "name": "Push Kick",
+    "messages": [ "You push kick %s!", "<npcname> push kicks %s!" ],
+    "unarmed_allowed": true,
+    "mult_bonuses": [
+      { "stat": "damage", "type": "bash", "scale": 1.2 },
+      { "stat": "damage", "type": "cut", "scale": 1.2 },
+      { "stat": "damage", "type": "stab", "scale": 1.2 }
+    ],
+    "attack_vectors": [ "FOOT" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_capoeira_circlekick",
+    "name": "Circle Kick",
+    "messages": [ "You circle kick %s!", "<npcname> circle kicks %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 4 } ],
+    "unarmed_allowed": true,
+    "crit_tec": true,
+    "mult_bonuses": [
+      { "stat": "damage", "type": "bash", "scale": 1.4 },
+      { "stat": "damage", "type": "cut", "scale": 1.4 },
+      { "stat": "damage", "type": "stab", "scale": 1.4 }
+    ],
+    "attack_vectors": [ "FOOT" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_capoeira_sweepkick",
+    "name": "Sweep Kick",
+    "messages": [ "You sweep kick %s!", "<npcname> sweep kicks %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 2 } ],
+    "unarmed_allowed": true,
+    "required_buffs_all": [ "buff_capoeira_onmove" ],
+    "weighting": 2,
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "math": [ "u_val('size') - 1", "<=", "n_val('size')" ] },
+        { "or": [ { "npc_bodytype": "angel" }, { "npc_bodytype": "human" } ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>similar</info> size incapable of flight",
+    "down_dur": 1,
+    "mult_bonuses": [
+      { "stat": "movecost", "scale": 0.75 },
+      { "stat": "damage", "type": "bash", "scale": 1.2 },
+      { "stat": "damage", "type": "cut", "scale": 1.2 },
+      { "stat": "damage", "type": "stab", "scale": 1.2 }
+    ],
+    "attack_vectors": [ "FOOT" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_capoeira_spinkick",
+    "name": "Spin Kick",
+    "messages": [ "You spin kick %s!", "<npcname> spin kicks %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 5 } ],
+    "unarmed_allowed": true,
+    "required_buffs_all": [ "buff_capoeira_onmove" ],
+    "weighting": 2,
+    "crit_tec": true,
+    "condition": { "and": [ { "math": [ "u_val('size')", ">=", "n_val('size')" ] }, { "not": { "npc_has_effect": "stunned" } } ] },
+    "condition_desc": "* Only works on a <info>non-stunned</info> target of <info>similar or smaller</info> size",
+    "stun_dur": 1,
+    "mult_bonuses": [
+      { "stat": "movecost", "scale": 0.75 },
+      { "stat": "damage", "type": "bash", "scale": 1.4 },
+      { "stat": "damage", "type": "cut", "scale": 1.4 },
+      { "stat": "damage", "type": "stab", "scale": 1.4 }
+    ],
+    "attack_vectors": [ "FOOT" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_crane_feint",
+    "name": "Crane Wing",
+    "messages": [ "You raise your arms intimidatingly at %s!", "<npcname> performs the Crane Wing at %s!" ],
+    "unarmed_allowed": true,
+    "defensive": true,
+    "miss_recovery": true
+  },
+  {
+    "type": "technique",
+    "id": "tec_crane_precise",
+    "name": "Crane Kick",
+    "messages": [ "You leap and kick %s!", "<npcname> leaps and kicks %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 2 } ],
+    "unarmed_allowed": true,
+    "required_buffs_all": [ "buff_crane_ondodge" ],
+    "crit_ok": true,
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "or": [ { "npc_bodytype": "human" }, { "npc_bodytype": "angel" } ] },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>similar or smaller</info> size incapable of flight",
+    "down_dur": 1,
+    "mult_bonuses": [
+      { "stat": "damage", "type": "bash", "scale": 1.25 },
+      { "stat": "damage", "type": "cut", "scale": 1.25 },
+      { "stat": "damage", "type": "stab", "scale": 1.25 }
+    ],
+    "attack_vectors": [ "FOOT" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_crane_break",
+    "name": "Crane Flap",
+    "messages": [
+      "You were almost grabbed by %s, but you swing your arms and break free!",
+      "<npcname> was almost grabbed by %s, but they flap free!"
+    ],
+    "skill_requirements": [ { "name": "unarmed", "level": 3 } ],
+    "unarmed_allowed": true,
+    "defensive": true,
+    "grab_break": true
+  },
+  {
+    "type": "technique",
+    "id": "tec_crane_strike",
+    "name": "Crane Strike",
+    "messages": [ "You hand-peck and strike %s!", "<npcname> hand-pecks and strikes %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 4 } ],
+    "unarmed_allowed": true,
+    "required_buffs_all": [ "buff_crane_ondodge" ],
+    "crit_ok": true,
+    "//condition": "TODO: differentiate the stun from the damage, though 1.5x flat is excessive",
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "not": { "npc_has_effect": "stunned" } },
+        {
+          "and": [
+            { "not": { "npc_has_species": "ZOMBIE" } },
+            { "not": { "npc_has_species": "NETHER" } },
+            { "not": { "npc_has_species": "NETHER_EMENATION" } },
+            { "not": { "npc_has_species": "LEECH_PLANT" } },
+            { "not": { "npc_has_species": "MIGO" } },
+            { "not": { "npc_has_species": "SLIME" } },
+            { "not": { "npc_has_species": "FUNGUS" } },
+            { "not": { "npc_has_species": "PLANT" } },
+            { "not": { "npc_has_species": "ROBOT" } },
+            { "not": { "npc_has_species": "CYBORG" } },
+            { "not": { "npc_has_species": "HALLUCINATION" } },
+            { "not": { "npc_has_species": "HORROR" } },
+            { "not": { "npc_has_species": "ABERRATION" } },
+            { "not": { "npc_has_species": "KRAKEN" } }
+          ]
+        }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-stunned mundane</info> target of <info>similar or smaller</info> size",
+    "stun_dur": 2,
+    "mult_bonuses": [
+      { "stat": "damage", "type": "bash", "scale": 1.5 },
+      { "stat": "damage", "type": "cut", "scale": 1.5 },
+      { "stat": "damage", "type": "stab", "scale": 1.5 }
+    ],
+    "attack_vectors": [ "WRIST" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_dragon_claw",
+    "name": "Dragon Claw",
+    "unarmed_allowed": true,
+    "mult_bonuses": [ { "stat": "damage", "type": "bash", "scale": 1.2 } ],
+    "messages": [ "You lash out at %s with a Dragon Claw!", "<npcname> lashes out at %s with a Dragon Claw!" ],
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_dragon_tail",
+    "name": "Dragon Tail",
+    "messages": [ "You sweep %s with a quick Dragon Tail!", "<npcname> sweeps %s with a quick Dragon Tail sweep!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 4 } ],
+    "unarmed_allowed": true,
+    "crit_tec": true,
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "math": [ "u_val('size') - 1", "<=", "n_val('size')" ] },
+        { "or": [ { "npc_bodytype": "angel" }, { "npc_bodytype": "human" } ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>similar</info> size incapable of flight",
+    "down_dur": 1,
+    "mult_bonuses": [
+      { "stat": "damage", "type": "bash", "scale": 1.4 },
+      { "stat": "damage", "type": "cut", "scale": 1.4 },
+      { "stat": "damage", "type": "stab", "scale": 1.4 }
+    ],
+    "attack_vectors": [ "FOOT" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_dragon_strike",
+    "name": "Dragon Strike",
+    "messages": [ "You descend upon %s with a powerful Dragon Strike!", "<npcname> descends upon %s with a powerful Dragon Strike!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 5 } ],
+    "unarmed_allowed": true,
+    "crit_tec": true,
+    "condition": { "npc_has_effect": "downed" },
+    "condition_desc": "* Only works on a <info>downed</info> target",
+    "stun_dur": 1,
+    "mult_bonuses": [
+      { "stat": "damage", "type": "bash", "scale": 1.5 },
+      { "stat": "damage", "type": "cut", "scale": 1.5 },
+      { "stat": "damage", "type": "stab", "scale": 1.5 }
+    ],
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_fencing_feint",
+    "messages": [ "You steady your weapon and fake a thrust at %s!", "<npcname> steadies their weapon and fakes a thrust at %s!" ],
+    "name": "Feint",
+    "skill_requirements": [ { "name": "melee", "level": 4 } ],
+    "melee_allowed": true,
+    "defensive": true,
+    "miss_recovery": true
+  },
+  {
+    "type": "technique",
+    "id": "tec_judo_throw",
+    "name": "Throw",
+    "messages": [ "You throw %s to the ground!", "<npcname> throws %s to the ground!" ],
+    "unarmed_allowed": true,
+    "melee_allowed": true,
+    "unarmed_weapons_allowed": false,
+    "crit_ok": true,
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size')", "<=", "n_val('size')" ] },
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "npc_bodytype": "human" },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>identical</info> size incapable of flight",
+    "down_dur": 1,
+    "mult_bonuses": [ { "stat": "damage", "type": "bash", "scale": 1.25 } ],
+    "attack_vectors": [ "THROW" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_judo_disarm",
+    "name": "Disarming Throw",
+    "messages": [ "You disarm and throw %s!", "<npcname> disarms and throws %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 3 } ],
+    "unarmed_allowed": true,
+    "melee_allowed": true,
+    "unarmed_weapons_allowed": false,
+    "disarms": true,
+    "tech_effects": [
+      {
+        "id": "disarmed",
+        "chance": 100,
+        "duration": 400,
+        "on_damage": true,
+        "message": "The weapon of %s has been forced out ot their hands!"
+      }
+    ],
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size')", "<=", "n_val('size')" ] },
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "npc_bodytype": "human" },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>identical</info> size incapable of flight",
+    "down_dur": 1,
+    "mult_bonuses": [ { "stat": "damage", "type": "bash", "scale": 1.25 } ],
+    "attack_vectors": [ "THROW" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_judo_backthrow",
+    "name": "Back Throw",
+    "messages": [ "You flip %s head over heels!", "<npcname> flips %s head over heels!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 2 } ],
+    "unarmed_allowed": true,
+    "melee_allowed": true,
+    "unarmed_weapons_allowed": false,
+    "crit_tec": true,
+    "side_switch": true,
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size')", "<=", "n_val('size')" ] },
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "npc_bodytype": "human" },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>identical</info> size incapable of flight",
+    "down_dur": 1,
+    "stun_dur": 1,
+    "mult_bonuses": [ { "stat": "damage", "type": "bash", "scale": 1.5 } ],
+    "attack_vectors": [ "THROW" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_judo_break",
+    "name": "Grab Break",
+    "messages": [
+      "You were almost grabbed by %s, but you break their feeble grapple!",
+      "<npcname> was almost grabbed by %s, but they break its feeble grapple!"
+    ],
+    "skill_requirements": [ { "name": "unarmed", "level": 1 } ],
+    "unarmed_allowed": true,
+    "melee_allowed": true,
+    "defensive": true,
+    "grab_break": true
+  },
+  {
+    "type": "technique",
+    "id": "tec_karate_precise",
+    "name": "Knifehand Strike",
+    "messages": [ "You hit %s with a knifehand strike!", "<npcname> hits %s with a knifehand strike!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 4 } ],
+    "unarmed_allowed": true,
+    "crit_tec": true,
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "not": { "npc_has_effect": "stunned" } },
+        {
+          "and": [
+            { "not": { "npc_has_species": "ZOMBIE" } },
+            { "not": { "npc_has_species": "NETHER" } },
+            { "not": { "npc_has_species": "NETHER_EMENATION" } },
+            { "not": { "npc_has_species": "LEECH_PLANT" } },
+            { "not": { "npc_has_species": "MIGO" } },
+            { "not": { "npc_has_species": "SLIME" } },
+            { "not": { "npc_has_species": "FUNGUS" } },
+            { "not": { "npc_has_species": "PLANT" } },
+            { "not": { "npc_has_species": "ROBOT" } },
+            { "not": { "npc_has_species": "CYBORG" } },
+            { "not": { "npc_has_species": "HALLUCINATION" } },
+            { "not": { "npc_has_species": "HORROR" } },
+            { "not": { "npc_has_species": "ABERRATION" } },
+            { "not": { "npc_has_species": "KRAKEN" } }
+          ]
+        }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-stunned mundane</info> target of <info>similar or smaller</info> size",
+    "stun_dur": 1,
+    "mult_bonuses": [
+      { "stat": "damage", "type": "bash", "scale": 1.4 },
+      { "stat": "damage", "type": "cut", "scale": 1.4 },
+      { "stat": "damage", "type": "stab", "scale": 1.4 }
+    ],
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_karate_rapid",
+    "name": "Backfist Strike",
+    "messages": [ "You quickly strike %s with the back of your fist!", "<npcname> quickly strikes %s with the back of their fist!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 1 } ],
+    "unarmed_allowed": true,
+    "mult_bonuses": [
+      { "stat": "movecost", "scale": 0.5 },
+      { "stat": "damage", "type": "bash", "scale": 0.66 },
+      { "stat": "damage", "type": "cut", "scale": 0.66 },
+      { "stat": "damage", "type": "stab", "scale": 0.66 }
+    ],
+    "attack_vectors": [ "HAND_BACK" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_karate_roundhouse",
+    "name": "Roundhouse Kick",
+    "messages": [ "You roundhouse kick %s!", "<npcname> roundhouse kicks %s!" ],
+    "unarmed_allowed": true,
+    "melee_allowed": true,
+    "mult_bonuses": [
+      { "stat": "damage", "type": "bash", "scale": 1.2 },
+      { "stat": "damage", "type": "cut", "scale": 1.2 },
+      { "stat": "damage", "type": "stab", "scale": 1.2 }
+    ],
+    "attack_vectors": [ "FOOT" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_kickboxing_rapid",
+    "name": "Jab",
+    "messages": [ "You quickly jab %s!", "<npcname> quickly jabs at %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 2 } ],
+    "unarmed_allowed": true,
+    "mult_bonuses": [
+      { "stat": "movecost", "scale": 0.5 },
+      { "stat": "damage", "type": "bash", "scale": 0.66 },
+      { "stat": "damage", "type": "cut", "scale": 0.66 },
+      { "stat": "damage", "type": "stab", "scale": 0.66 }
+    ],
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_kickboxing_cross",
+    "name": "Cross",
+    "messages": [ "You throw a heavy cross at %s!", "<npcname> throws a cross at %s!" ],
+    "unarmed_allowed": true,
+    "mult_bonuses": [
+      { "stat": "damage", "type": "bash", "scale": 1.2 },
+      { "stat": "damage", "type": "cut", "scale": 1.2 },
+      { "stat": "damage", "type": "stab", "scale": 1.2 }
+    ],
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_kickboxing_push",
+    "name": "Push Kick",
+    "messages": [ "You shove %s back with a front kick!", "<npcname> shoves %s back with a front kick!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 1 } ],
+    "unarmed_allowed": true,
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size')", ">=", "n_val('size')" ] },
+        {
+          "or": [
+            {
+              "and": [
+                { "npc_has_flag": "GRAB_FILTER" },
+                { "u_has_flag": "GRAB" },
+                {
+                  "roll_contested": { "math": [ "u_val('strength')" ] },
+                  "die_size": 20,
+                  "difficulty": { "math": [ "n_val('grab_strength')" ] }
+                }
+              ]
+            },
+            { "not": { "and": [ { "npc_has_flag": "GRAB_FILTER" }, { "u_has_flag": "GRAB" } ] } }
+          ]
+        }
+      ]
+    },
+    "condition_desc": "* Only works on a target of <info>similar or smaller</info> size, may fail on enemies grabbing you",
+    "knockback_dist": 1,
+    "attack_vectors": [ "FOOT" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_kickboxing_upper",
+    "name": "Uppercut",
+    "messages": [ "You uppercut %s!", "<npcname> uppercuts %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 4 } ],
+    "unarmed_allowed": true,
+    "crit_tec": true,
+    "//condition": "Things of similar size in both directions that keep their heads high",
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "math": [ "n_val('size') - 1", "<=", "n_val('size')" ] },
+        { "not": { "npc_has_effect": "stunned" } },
+        {
+          "or": [
+            { "npc_bodytype": "human" },
+            { "npc_bodytype": "mi-go" },
+            { "npc_bodytype": "kangoroo" },
+            { "npc_bodytype": "horse" },
+            { "npc_bodytype": "bear" },
+            { "npc_bodytype": "angel" }
+          ]
+        },
+        {
+          "and": [
+            { "not": { "npc_has_species": "ZOMBIE" } },
+            { "not": { "npc_has_species": "NETHER" } },
+            { "not": { "npc_has_species": "NETHER_EMENATION" } },
+            { "not": { "npc_has_species": "LEECH_PLANT" } },
+            { "not": { "npc_has_species": "MIGO" } },
+            { "not": { "npc_has_species": "SLIME" } },
+            { "not": { "npc_has_species": "FUNGUS" } },
+            { "not": { "npc_has_species": "PLANT" } },
+            { "not": { "npc_has_species": "ROBOT" } },
+            { "not": { "npc_has_species": "CYBORG" } },
+            { "not": { "npc_has_species": "HALLUCINATION" } },
+            { "not": { "npc_has_species": "HORROR" } },
+            { "not": { "npc_has_species": "ABERRATION" } },
+            { "not": { "npc_has_species": "KRAKEN" } }
+          ]
+        }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-stunned</info> target of <info>similar</info> size incapable of flight",
+    "stun_dur": 1,
+    "mult_bonuses": [ { "stat": "damage", "type": "bash", "scale": 1.4 } ],
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_kickboxing_roundhouse",
+    "name": "Roundhouse Kick",
+    "messages": [ "You roundhouse kick %s!", "<npcname> roundhouse kicks %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 2 } ],
+    "unarmed_allowed": true,
+    "melee_allowed": true,
+    "crit_ok": true,
+    "mult_bonuses": [
+      { "stat": "damage", "type": "bash", "scale": 1.4 },
+      { "stat": "damage", "type": "cut", "scale": 1.4 },
+      { "stat": "damage", "type": "stab", "scale": 1.4 }
+    ],
+    "attack_vectors": [ "FOOT" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_krav_maga_disarm_simple",
+    "messages": [ "You quickly slap and disarm %s!", "<npcname> quickly slaps and disarms %s!" ],
+    "name": "Disarming Slap",
+    "skill_requirements": [ { "name": "unarmed", "level": 2 } ],
+    "melee_allowed": true,
+    "unarmed_allowed": true,
+    "mult_bonuses": [ { "stat": "movecost", "scale": 0.9 } ],
+    "disarms": true,
+    "tech_effects": [
+      {
+        "id": "disarmed",
+        "chance": 100,
+        "duration": 400,
+        "on_damage": true,
+        "message": "The weapon of %s has been forced out ot their hands!"
+      }
+    ],
+    "attack_vectors": [ "WEAPON", "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_krav_maga_takedown",
+    "name": "Takedown",
+    "messages": [ "You force %s to the ground!", "<npcname> forces %s to the ground!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 3 } ],
+    "melee_allowed": true,
+    "unarmed_allowed": true,
+    "crit_ok": true,
+    "weighting": 2,
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "or": [ { "npc_bodytype": "human" }, { "npc_bodytype": "angel" } ] },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>similar or smaller</info> size incapable of flight",
+    "down_dur": 1,
+    "attack_vectors": [ "THROW" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_krav_maga_break",
+    "name": "Grab Break",
+    "messages": [ "You were almost grabbed by %s, but you wrestle free!", "<npcname> was almost grabbed by %s, but they wrestle free!" ],
+    "skill_requirements": [ { "name": "melee", "level": 3 } ],
+    "melee_allowed": true,
+    "unarmed_allowed": true,
+    "defensive": true,
+    "grab_break": true
+  },
+  {
+    "type": "technique",
+    "id": "tec_muay_thai_rapid",
+    "name": "Jab",
+    "messages": [ "You quickly jab %s!", "<npcname> quickly jabs at %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 1 } ],
+    "unarmed_allowed": true,
+    "mult_bonuses": [
+      { "stat": "movecost", "scale": 0.5 },
+      { "stat": "damage", "type": "bash", "scale": 0.66 },
+      { "stat": "damage", "type": "cut", "scale": 0.66 },
+      { "stat": "damage", "type": "stab", "scale": 0.66 }
+    ],
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_muay_thai_cross",
+    "name": "Cross",
+    "messages": [ "You throw a heavy cross at %s!", "<npcname> throws a cross at %s!" ],
+    "unarmed_allowed": true,
+    "mult_bonuses": [
+      { "stat": "damage", "type": "bash", "scale": 1.2 },
+      { "stat": "damage", "type": "cut", "scale": 1.2 },
+      { "stat": "damage", "type": "stab", "scale": 1.2 }
+    ],
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_muay_thai_elbow",
+    "name": "Elbow Strike",
+    "messages": [ "You slam your elbow into %s!", "<npcname> slams their elbow into %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 1 } ],
+    "unarmed_allowed": true,
+    "crit_tec": true,
+    "flat_bonuses": [ { "stat": "damage", "type": "cut", "scale": 2 } ],
+    "mult_bonuses": [ { "stat": "movecost", "scale": 0.66 } ],
+    "attack_vectors": [ "ELBOW" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_muay_thai_roundhouse",
+    "name": "Roundhouse Kick",
+    "messages": [ "You roundhouse kick %s!", "<npcname> roundhouse kicks %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 2 } ],
+    "unarmed_allowed": true,
+    "crit_ok": true,
+    "mult_bonuses": [
+      { "stat": "damage", "type": "bash", "scale": 1.4 },
+      { "stat": "damage", "type": "cut", "scale": 1.4 },
+      { "stat": "damage", "type": "stab", "scale": 1.4 }
+    ],
+    "attack_vectors_random": [ "LOWER_LEG", "FOOT" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_muay_thai_push",
+    "name": "Push Kick",
+    "messages": [ "You shove %s back with a front kick!", "<npcname> shoves %s back with a front kick!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 1 } ],
+    "unarmed_allowed": true,
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size')", ">=", "n_val('size')" ] },
+        {
+          "or": [
+            {
+              "and": [
+                { "npc_has_flag": "GRAB_FILTER" },
+                { "u_has_flag": "GRAB" },
+                {
+                  "roll_contested": { "math": [ "u_val('strength')" ] },
+                  "die_size": 20,
+                  "difficulty": { "math": [ "n_val('grab_strength')" ] }
+                }
+              ]
+            },
+            { "not": { "and": [ { "npc_has_flag": "GRAB_FILTER" }, { "u_has_flag": "GRAB" } ] } }
+          ]
+        }
+      ]
+    },
+    "condition_desc": "* Only works on a target of <info>similar or smaller</info> size, may fail on enemies grabbing you",
+    "knockback_dist": 1,
+    "attack_vectors": [ "FOOT" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_muay_thai_knee",
+    "name": "Knee Strike",
+    "messages": [ "You drive your knee into %s!", "<npcname> drives their knee into %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 5 } ],
+    "unarmed_allowed": true,
+    "crit_tec": true,
+    "stun_dur": 1,
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "not": { "npc_has_effect": "stunned" } },
+        {
+          "and": [
+            { "not": { "npc_has_species": "ZOMBIE" } },
+            { "not": { "npc_has_species": "NETHER" } },
+            { "not": { "npc_has_species": "NETHER_EMENATION" } },
+            { "not": { "npc_has_species": "LEECH_PLANT" } },
+            { "not": { "npc_has_species": "MIGO" } },
+            { "not": { "npc_has_species": "SLIME" } },
+            { "not": { "npc_has_species": "FUNGUS" } },
+            { "not": { "npc_has_species": "PLANT" } },
+            { "not": { "npc_has_species": "ROBOT" } },
+            { "not": { "npc_has_species": "CYBORG" } },
+            { "not": { "npc_has_species": "HALLUCINATION" } },
+            { "not": { "npc_has_species": "HORROR" } },
+            { "not": { "npc_has_species": "ABERRATION" } },
+            { "not": { "npc_has_species": "KRAKEN" } }
+          ]
+        }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-stunned mundane</info> target of <info>similar or smaller</info> size",
+    "mult_bonuses": [ { "stat": "damage", "type": "bash", "scale": 1.35 } ],
+    "attack_vectors": [ "KNEE" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_muay_thai_break",
+    "name": "Grab Break",
+    "messages": [
+      "You were almost grabbed by %s, but you break the clinch!",
+      "<npcname> was almost grabbed by %s, but they break the clinch!"
+    ],
+    "skill_requirements": [ { "name": "unarmed", "level": 3 } ],
+    "unarmed_allowed": true,
+    "melee_allowed": true,
+    "defensive": true,
+    "grab_break": true
+  },
+  {
+    "type": "technique",
+    "id": "tec_pankration_cross",
+    "name": "Cross",
+    "messages": [ "You throw a heavy cross at %s!", "<npcname> throws a cross at %s!" ],
+    "unarmed_allowed": true,
+    "mult_bonuses": [
+      { "stat": "damage", "type": "bash", "scale": 1.2 },
+      { "stat": "damage", "type": "cut", "scale": 1.2 },
+      { "stat": "damage", "type": "stab", "scale": 1.2 }
+    ],
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_pankration_kick",
+    "name": "Kick",
+    "messages": [ "You kick %s hard!", "<npcname> kicks %s hard!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 2 } ],
+    "unarmed_allowed": true,
+    "crit_tec": true,
+    "//condition": "Humanoids of similar size and no flying",
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "math": [ "n_val('size')", "!=", "1" ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "or": [ { "npc_bodytype": "human" }, { "npc_bodytype": "angel" } ] },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>similar or smaller</info> size incapable of flight",
+    "down_dur": 2,
+    "attack_vectors": [ "FOOT" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_pankration_break",
+    "name": "Grab Break",
+    "messages": [ "You were almost grabbed by %s, but you wrestle free!", "<npcname> was almost grabbed by %s, but they wrestle free!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 3 } ],
+    "unarmed_allowed": true,
+    "defensive": true,
+    "grab_break": true
+  },
+  {
+    "type": "technique",
+    "id": "tec_pankration_grabknee",
+    "name": "Grab and Knee",
+    "messages": [ "You grab and knee %s!", "<npcname> grabs and knees %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 3 } ],
+    "unarmed_allowed": true,
+    "condition": { "npc_has_effect": "downed" },
+    "condition_desc": "* Only works on a <info>downed</info> target",
+    "weighting": 3,
+    "mult_bonuses": [ { "stat": "movecost", "scale": 0.5 } ],
+    "attack_vectors": [ "KNEE" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_pankration_grabdisarm",
+    "name": "Arm Lock",
+    "messages": [ "You disarm %s with an arm lock!", "<npcname> disarms %s with an arm lock!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 4 } ],
+    "unarmed_allowed": true,
+    "condition": { "npc_has_effect": "downed" },
+    "condition_desc": "* Only works on a <info>downed</info> target",
+    "crit_ok": true,
+    "weighting": 3,
+    "disarms": true,
+    "tech_effects": [ { "id": "disarmed", "chance": 100, "duration": 400, "on_damage": true, "message": "The hand of %s is forced open!" } ],
+    "flat_bonuses": [ { "stat": "arpen", "type": "bash", "scaling-stat": "str", "scale": 1.0 } ],
+    "mult_bonuses": [ { "stat": "damage", "type": "bash", "scale": 1.25 } ],
+    "attack_vectors": [ "GRAPPLE" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_pankration_grabthrow",
+    "name": "Grab and Throw",
+    "messages": [ "You grab and throw %s!", "<npcname> grabs and throws %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 5 } ],
+    "unarmed_allowed": true,
+    "weighting": 3,
+    "crit_tec": true,
+    "down_dur": 2,
+    "knockback_dist": 2,
+    "knockback_spread": 2,
+    "//condition": "Humanoids of similar size and no flying",
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "math": [ "n_val('size')", "!=", "1" ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "or": [ { "npc_bodytype": "human" }, { "npc_bodytype": "angel" } ] },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] },
+        {
+          "or": [
+            {
+              "and": [
+                { "npc_has_flag": "GRAB_FILTER" },
+                { "u_has_flag": "GRAB" },
+                {
+                  "roll_contested": { "math": [ "u_val('strength')" ] },
+                  "die_size": 20,
+                  "difficulty": { "math": [ "n_val('grab_strength')" ] }
+                }
+              ]
+            },
+            { "not": { "and": [ { "npc_has_flag": "GRAB_FILTER" }, { "u_has_flag": "GRAB" } ] } }
+          ]
+        }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>similar or smaller</info> size incapable of flight, may fail on targets <info>grabbing you</info>",
+    "mult_bonuses": [ { "stat": "damage", "type": "bash", "scale": 2.0 } ],
+    "attack_vectors": [ "THROW" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_taekwondo_disarm",
+    "name": "Snatch Weapon",
+    "messages": [ "You snatch %s's weapon!", "<npcname> snatches %s's weapon!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 4 } ],
+    "unarmed_allowed": true,
+    "weighting": 2,
+    "take_weapon": true,
+    "mult_bonuses": [ { "stat": "damage", "type": "bash", "scale": 0.5 } ],
+    "attack_vectors": [ "HAND" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_taekwondo_strong",
+    "name": "Spinning Back Kick",
+    "messages": [
+      "You spin and back-kick %s, right in the center of gravity!",
+      "<npcname> spins and back-kicks %s, right in the center of gravity!"
+    ],
+    "skill_requirements": [ { "name": "unarmed", "level": 5 } ],
+    "melee_allowed": true,
+    "unarmed_allowed": true,
+    "crit_tec": true,
+    "down_dur": 2,
+    "//condition": "Humanoids of similar size and no flying",
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "or": [ { "npc_bodytype": "human" }, { "npc_bodytype": "angel" } ] },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] },
+        {
+          "or": [
+            {
+              "and": [
+                { "npc_has_flag": "GRAB_FILTER" },
+                { "u_has_flag": "GRAB" },
+                {
+                  "roll_contested": { "math": [ "u_val('strength')" ] },
+                  "die_size": 20,
+                  "difficulty": { "math": [ "n_val('grab_strength')" ] }
+                }
+              ]
+            },
+            { "not": { "and": [ { "npc_has_flag": "GRAB_FILTER" }, { "u_has_flag": "GRAB" } ] } }
+          ]
+        }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>similar or smaller</info> size incapable of flight, may fail on targets <info>grabbing you</info>",
+    "knockback_dist": 2,
+    "mult_bonuses": [
+      { "stat": "movecost", "scale": 1.5 },
+      { "stat": "damage", "type": "bash", "scale": 1.5 },
+      { "stat": "damage", "type": "cut", "scale": 1.5 },
+      { "stat": "damage", "type": "stab", "scale": 1.5 }
+    ],
+    "attack_vectors": [ "FOOT" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_taekwondo_push",
+    "name": "Side Kick",
+    "messages": [ "You turn slightly and side-kick %s!", "<npcname> turns slightly and side-kicks %s!" ],
+    "melee_allowed": true,
+    "unarmed_allowed": true,
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size')", ">=", "n_val('size')" ] },
+        {
+          "or": [
+            {
+              "and": [
+                { "npc_has_flag": "GRAB_FILTER" },
+                { "u_has_flag": "GRAB" },
+                {
+                  "roll_contested": { "math": [ "u_val('strength')" ] },
+                  "die_size": 20,
+                  "difficulty": { "math": [ "n_val('grab_strength')" ] }
+                }
+              ]
+            },
+            { "not": { "and": [ { "npc_has_flag": "GRAB_FILTER" }, { "u_has_flag": "GRAB" } ] } }
+          ]
+        }
+      ]
+    },
+    "condition_desc": "* Only works on a target of <info>similar or smaller</info> size, may fail on enemies grabbing you",
+    "knockback_dist": 1,
+    "attack_vectors": [ "FOOT" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_taekwondo_sweep",
+    "name": "Sweep Kick",
+    "messages": [ "You crouch low and sweep-kick %s!", "<npcname> crouches low and sweep-kicks %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 2 } ],
+    "melee_allowed": true,
+    "unarmed_allowed": true,
+    "crit_ok": true,
+    "condition": {
+      "and": [
+        { "math": [ "u_val('size') + 1", ">=", "n_val('size')" ] },
+        { "not": { "npc_has_effect": "downed" } },
+        { "or": [ { "npc_bodytype": "human" }, { "npc_bodytype": "angel" } ] },
+        { "or": [ { "not": { "npc_has_flag": "FLIES" } }, { "npc_has_flag": "DISABLE_FLIGHT" } ] }
+      ]
+    },
+    "condition_desc": "* Only works on a <info>non-downed humanoid</info> target of <info>similar or smaller</info> size incapable of flight",
+    "down_dur": 1,
+    "attack_vectors_random": [ "FOOT", "LOWER_LEG" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_taekwondo_roundhouse",
+    "name": "Roundhouse Kick",
+    "messages": [ "You roundhouse kick %s!", "<npcname> roundhouse kicks %s!" ],
+    "melee_allowed": true,
+    "unarmed_allowed": true,
+    "mult_bonuses": [
+      { "stat": "damage", "type": "bash", "scale": 1.2 },
+      { "stat": "damage", "type": "cut", "scale": 1.2 },
+      { "stat": "damage", "type": "stab", "scale": 1.2 }
+    ],
+    "attack_vectors": [ "FOOT" ]
+  },
+  {
+    "type": "technique",
+    "id": "tec_taekwondo_feint",
+    "name": "Feint",
+    "messages": [ "You fake a kick at %s!", "<npcname> fakes a kick at %s!" ],
+    "skill_requirements": [ { "name": "unarmed", "level": 3 } ],
+    "melee_allowed": true,
+    "unarmed_allowed": true,
+    "defensive": true,
+    "miss_recovery": true
+  },
+  {
+    "type": "technique",
+    "id": "tec_debug_eoc_demo",
+    "name": "Extreme Offensive Chop!",
+    "unarmed_allowed": true,
+    "melee_allowed": true,
+    "skill_requirements": [ { "name": "speech", "level": 10 } ],
+    "weighting": 100,
+    "messages": [ "You strike %s with an Extreme Offensive Chop!", "<npcname> strikes %s with an Extreme Offensive Chop!" ],
+    "eocs": [
+      {
+        "id": "EOC_TECH_DEBGU_EOC_DEMO",
+        "effect": [
+          { "u_message": "That was so awesome, the foe decides to surrender!", "type": "good" },
+          "follow",
+          { "arithmetic": [ { "npc_val": "friendly" }, "=", { "const": 100 } ] }
+        ]
+      }
+    ],
+    "attack_vectors": [ "WEAPON", "HAND" ]
+  }
+]
