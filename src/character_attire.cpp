@@ -2023,29 +2023,48 @@ std::unordered_set<bodypart_id> outfit::where_discomfort( const Character &guy )
 void outfit::fire_options( Character &guy, std::vector<std::string> &options,
                            std::vector<std::function<void()>> &actions )
 {
-    for( item &clothing : worn ) {
+    std::vector<item *> guns = guy.cache_get_items_with( "is_gun", &item::is_gun,
+    [&guy]( const item & it ) {
+        return !guy.is_wielding( it );
+    } );
 
-        std::vector<item *> guns = guy.cache_get_items_with( "is_gun", &item::is_gun,
-        [&guy]( const item & it ) {
-            return !guy.is_wielding( it );
-        } );
-
-        if( !guns.empty() && clothing.type->can_use( "holster" ) ) {
-            //~ draw (first) gun contained in holster
-            //~ %1$s: weapon name, %2$s: container name, %3$d: remaining ammo count
+    for( const item *gun : guns )  {
+        item* container = gun->find_parent(*gun);
+        if ( container->type->can_use("holster") ) {
             options.push_back( string_format( pgettext( "holster", "%1$s from %2$s (%3$d)" ),
-                                              guns.front()->tname(),
-                                              clothing.type_name(),
-                                              guns.front()->ammo_remaining() ) );
+                                              gun->tname(),
+                                              container->type_name(),
+                                              gun->ammo_remaining() ) );
+        actions.emplace_back( [&] { guy.invoke_item( container, "holster" ); } );
 
-            actions.emplace_back( [&] { guy.invoke_item( &clothing, "holster" ); } );
-
-        } else if( clothing.is_gun() && clothing.gunmod_find( itype_shoulder_strap ) ) {
+        } else if( container->is_gun() && container->gunmod_find( itype_shoulder_strap ) ) {
             // wield item currently worn using shoulder strap
-            options.push_back( clothing.display_name() );
-            actions.emplace_back( [&] { guy.wield( clothing ); } );
+            options.push_back( container->display_name() );
+            actions.emplace_back( [&] { guy.wield( *container ); } );
         }
     }
+
+
+
+    // for( item &clothing : worn ) {
+
+
+    //     if( !guns.empty() && clothing.type->can_use( "holster" ) ) {
+    //         //~ draw (first) gun contained in holster
+    //         //~ %1$s: weapon name, %2$s: container name, %3$d: remaining ammo count
+    //         options.push_back( string_format( pgettext( "holster", "%1$s from %2$s (%3$d)" ),
+    //                                           guns.front()->tname(),
+    //                                           clothing.type_name(),
+    //                                           guns.front()->ammo_remaining() ) );
+
+    //         actions.emplace_back( [&] { guy.invoke_item( &clothing, "holster" ); } );
+
+    //     } else if( clothing.is_gun() && clothing.gunmod_find( itype_shoulder_strap ) ) {
+    //         // wield item currently worn using shoulder strap
+    //         options.push_back( clothing.display_name() );
+    //         actions.emplace_back( [&] { guy.wield( clothing ); } );
+    //     }
+    // }
 }
 
 void outfit::insert_item_at_index( const item &clothing, int index )
