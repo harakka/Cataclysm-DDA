@@ -5,28 +5,34 @@
 #include <functional>
 #include <iosfwd>
 #include <iterator>
-#include <new>
 #include <string>
 #include <tuple>
-#include <type_traits>
 
+#include "avatar.h"
+#include "calendar.h"
+#include "cata_path.h"
 #include "cata_utility.h"
 #include "character.h"
-#include "colony.h"
+#include "color.h"
 #include "construction.h"
 #include "construction_group.h"
-#include "cursesdef.h"
 #include "debug.h"
 #include "faction.h"
+#include "field_type.h"
+#include "flexbuffer_json-inl.h"
+#include "flexbuffer_json.h"
+#include "game_constants.h"
 #include "generic_factory.h"
 #include "iexamine.h"
+#include "init.h"
 #include "item.h"
 #include "item_category.h"
+#include "item_group.h"
 #include "item_pocket.h"
 #include "item_search.h"
 #include "itype.h"
 #include "json.h"
-#include "line.h"
+#include "json_error.h"
 #include "localized_comparator.h"
 #include "make_static.h"
 #include "map.h"
@@ -53,13 +59,12 @@ static const itype_id itype_null( "null" );
 static const zone_type_id zone_type_AUTO_DRINK( "AUTO_DRINK" );
 static const zone_type_id zone_type_AUTO_EAT( "AUTO_EAT" );
 static const zone_type_id zone_type_CAMP_FOOD( "CAMP_FOOD" );
-static const zone_type_id zone_type_CAMP_STORAGE( "CAMP_STORAGE" );
-static const zone_type_id zone_type_CHOP_TREES( "CHOP_TREES" );
 static const zone_type_id zone_type_CONSTRUCTION_BLUEPRINT( "CONSTRUCTION_BLUEPRINT" );
+static const zone_type_id zone_type_DISASSEMBLE( "DISASSEMBLE" );
 static const zone_type_id zone_type_FARM_PLOT( "FARM_PLOT" );
-static const zone_type_id zone_type_FISHING_SPOT( "FISHING_SPOT" );
 static const zone_type_id zone_type_LOOT_CORPSE( "LOOT_CORPSE" );
 static const zone_type_id zone_type_LOOT_CUSTOM( "LOOT_CUSTOM" );
+static const zone_type_id zone_type_LOOT_DEFAULT( "LOOT_DEFAULT" );
 static const zone_type_id zone_type_LOOT_DRINK( "LOOT_DRINK" );
 static const zone_type_id zone_type_LOOT_FOOD( "LOOT_FOOD" );
 static const zone_type_id zone_type_LOOT_IGNORE( "LOOT_IGNORE" );
@@ -69,67 +74,30 @@ static const zone_type_id zone_type_LOOT_PFOOD( "LOOT_PFOOD" );
 static const zone_type_id zone_type_LOOT_SEEDS( "LOOT_SEEDS" );
 static const zone_type_id zone_type_LOOT_UNSORTED( "LOOT_UNSORTED" );
 static const zone_type_id zone_type_LOOT_WOOD( "LOOT_WOOD" );
-static const zone_type_id zone_type_MINING( "MINING" );
-static const zone_type_id zone_type_MOPPING( "MOPPING" );
 static const zone_type_id zone_type_NO_AUTO_PICKUP( "NO_AUTO_PICKUP" );
 static const zone_type_id zone_type_NO_NPC_PICKUP( "NO_NPC_PICKUP" );
 static const zone_type_id zone_type_SOURCE_FIREWOOD( "SOURCE_FIREWOOD" );
-static const zone_type_id zone_type_VEHICLE_DECONSTRUCT( "VEHICLE_DECONSTRUCT" );
-static const zone_type_id zone_type_VEHICLE_PATROL( "VEHICLE_PATROL" );
-static const zone_type_id zone_type_VEHICLE_REPAIR( "VEHICLE_REPAIR" );
-static const zone_type_id zone_type_zone_disassemble( "zone_disassemble" );
-static const zone_type_id zone_type_zone_unload_all( "zone_unload_all" );
+static const zone_type_id zone_type_STRIP_CORPSES( "STRIP_CORPSES" );
+static const zone_type_id zone_type_UNLOAD_ALL( "UNLOAD_ALL" );
+
+const std::vector<zone_type_id> ignorable_zone_types = {
+    zone_type_AUTO_EAT,
+    zone_type_AUTO_DRINK,
+    zone_type_DISASSEMBLE,
+    zone_type_SOURCE_FIREWOOD,
+};
+
+static const std::unordered_map< std::string, zone_type_id> legacy_zone_types = {
+    {"zone_disassemble", zone_type_DISASSEMBLE},
+    {"zone_strip", zone_type_STRIP_CORPSES},
+    {"zone_unload_all", zone_type_UNLOAD_ALL}
+};
 
 zone_manager::zone_manager()
 {
     for( const zone_type &zone : zone_type::get_all() ) {
         types.emplace( zone.id, zone );
     }
-
-    types.emplace( zone_type_SOURCE_FIREWOOD,
-                   zone_type( to_translation( "Source: Firewood" ),
-                              to_translation( "Source for firewood or other flammable materials in this zone may be used to automatically refuel fires.  "
-                                      "This will be done to maintain light during long-running tasks such as crafting, reading or waiting." ) ) );
-    types.emplace( zone_type_CONSTRUCTION_BLUEPRINT,
-                   zone_type( to_translation( "Construction: Blueprint" ),
-                              to_translation( "Designate a blueprint zone for construction." ) ) );
-    types.emplace( zone_type_FARM_PLOT,
-                   zone_type( to_translation( "Farm: Plot" ),
-                              to_translation( "Designate a farm plot for tilling and planting." ) ) );
-    types.emplace( zone_type_CHOP_TREES,
-                   zone_type( to_translation( "Chop Trees" ),
-                              to_translation( "Designate an area to chop down trees." ) ) );
-    types.emplace( zone_type_FISHING_SPOT,
-                   zone_type( to_translation( "Fishing Spot" ),
-                              to_translation( "Designate an area to fish from." ) ) );
-    types.emplace( zone_type_MINING,
-                   zone_type( to_translation( "Mine Terrain" ),
-                              to_translation( "Designate an area to mine." ) ) );
-    types.emplace( zone_type_MOPPING,
-                   zone_type( to_translation( "Mop Tile" ),
-                              to_translation( "Designate an area to mop clean." ) ) );
-    types.emplace( zone_type_VEHICLE_DECONSTRUCT,
-                   zone_type( to_translation( "Vehicle Deconstruct Zone" ),
-                              to_translation( "Any vehicles in this area are marked for deconstruction." ) ) );
-    types.emplace( zone_type_VEHICLE_REPAIR,
-                   zone_type( to_translation( "Vehicle Repair Zone" ),
-                              to_translation( "Any vehicles in this area are marked for repair work." ) ) );
-    types.emplace( zone_type_VEHICLE_PATROL,
-                   zone_type( to_translation( "Vehicle Patrol Zone" ),
-                              to_translation( "Vehicles with an autopilot will patrol in this zone." ) ) );
-    types.emplace( zone_type_CAMP_STORAGE,
-                   zone_type( to_translation( "Basecamp: Storage" ),
-                              to_translation( "Items in this zone will be added to a basecamp's inventory for use by its workers." ) ) );
-    types.emplace( zone_type_CAMP_FOOD,
-                   zone_type( to_translation( "Basecamp: Food" ),
-                              to_translation( "Items in this zone will be added to a basecamp's food supply in the Distribute Food mission." ) ) );
-    types.emplace( zone_type_AUTO_EAT,
-                   zone_type( to_translation( "Auto Eat" ),
-                              to_translation( "Items in this zone will be automatically eaten during a long activity if you get hungry." ) ) );
-    types.emplace( zone_type_AUTO_DRINK,
-                   zone_type( to_translation( "Auto Drink" ),
-                              to_translation( "Items in this zone will be automatically consumed during a long activity if you get thirsty." ) ) );
-
 }
 
 void zone_manager::clear()
@@ -151,6 +119,11 @@ std::string zone_type::name() const
 std::string zone_type::desc() const
 {
     return desc_.translated();
+}
+
+field_type_str_id zone_type::get_field() const
+{
+    return field_;
 }
 
 namespace
@@ -189,6 +162,7 @@ void zone_type::load( const JsonObject &jo, const std::string_view )
 {
     mandatory( jo, was_loaded, "name", name_ );
     mandatory( jo, was_loaded, "id", id );
+    mandatory( jo, was_loaded, "display_field", field_ );
     optional( jo, was_loaded, "description", desc_, translation() );
     optional( jo, was_loaded, "can_be_personal", can_be_personal );
     optional( jo, was_loaded, "hidden", hidden );
@@ -202,8 +176,11 @@ shared_ptr_fast<zone_options> zone_options::create( const zone_type_id &type )
         return make_shared_fast<blueprint_options>();
     } else if( type == zone_type_LOOT_CUSTOM || type == zone_type_LOOT_ITEM_GROUP ) {
         return make_shared_fast<loot_options>();
-    } else if( type == zone_type_zone_unload_all ) {
+    } else if( type == zone_type_UNLOAD_ALL ) {
         return make_shared_fast<unload_options>();
+    } else if( std::find( ignorable_zone_types.begin(), ignorable_zone_types.end(),
+                          type ) != ignorable_zone_types.end() ) {
+        return make_shared_fast<ignorable_options>();
     }
 
     return make_shared_fast<zone_options>();
@@ -217,8 +194,11 @@ bool zone_options::is_valid( const zone_type_id &type, const zone_options &optio
         return dynamic_cast<const blueprint_options *>( &options ) != nullptr;
     } else if( type == zone_type_LOOT_CUSTOM || type == zone_type_LOOT_ITEM_GROUP ) {
         return dynamic_cast<const loot_options *>( &options ) != nullptr;
-    } else if( type == zone_type_zone_unload_all ) {
+    } else if( type == zone_type_UNLOAD_ALL ) {
         return dynamic_cast<const unload_options *>( &options ) != nullptr;
+    } else if( std::find( ignorable_zone_types.begin(), ignorable_zone_types.end(),
+                          type ) != ignorable_zone_types.end() ) {
+        return dynamic_cast<const ignorable_options *>( &options ) != nullptr;
     }
 
     // ensure options is not derived class for the rest of zone types
@@ -277,6 +257,12 @@ blueprint_options::query_con_result blueprint_options::query_con()
     }
 }
 
+ignorable_options::query_ignorable_result ignorable_options::query_ignorable()
+{
+    ignore_contents = query_yn( _( "Ignore items in this area when sorting?" ) );
+    return changed;
+}
+
 loot_options::query_loot_result loot_options::query_loot()
 {
     string_input_popup()
@@ -292,20 +278,33 @@ loot_options::query_loot_result loot_options::query_loot()
 
 unload_options::query_unload_result unload_options::query_unload()
 {
-    molle = query_yn( _( "Detach MOLLE attached pouches" ) );
-    mods = query_yn( _( "Detach mods from weapons" ) );
+    molle = query_yn( _( "Detach MOLLE attached pouches?" ) );
+    mods = query_yn(
+               _( "Detach mods from weapons?  (Be careful as you may not have the skills to reattach them)" ) );
+    sparse_only = query_yn( _
+                            ( string_format( "Avoid unloading items stacks (not charges) greater than a certain amount?  (Amount defined in next window)" ) ) );
+    if( sparse_only ) {
+        int threshold;
+        if( query_int( threshold,
+                       _( "What is the maximum stack size to unload?  (20 is a good default)" ) ) ) {
+            if( sparse_threshold < 1 ) {
+                sparse_threshold = 1;
+            } else {
+                sparse_threshold = threshold;
+            }
+        } else {
+            return canceled;
+        }
+    }
     always_unload = query_yn(
-                        _( "Always unload (even if the container has a valid sorting location)" ) );
+                        _( "Always unload?  (Unload even if the container has a valid sorting location)" ) );
     return changed;
 }
 
 plot_options::query_seed_result plot_options::query_seed()
 {
     Character &player_character = get_player_character();
-
-    std::vector<item *> seed_inv = player_character.items_with( []( const item & itm ) {
-        return itm.is_seed();
-    } );
+    std::vector<item *> seed_inv = player_character.cache_get_items_with( "is_seed", &item::is_seed );
     zone_manager &mgr = zone_manager::get_manager();
     map &here = get_map();
     const std::unordered_set<tripoint_abs_ms> zone_src_set =
@@ -356,89 +355,19 @@ plot_options::query_seed_result plot_options::query_seed()
     }
 }
 
-bool loot_options::query_at_creation()
-{
-    return query_loot() != canceled;
-}
-
-bool unload_options::query_at_creation()
-{
-    return query_unload() != canceled;
-}
-
-bool loot_options::query()
-{
-    return query_loot() == changed;
-}
-
-bool unload_options::query()
-{
-    return query_unload() == changed;
-}
-
-std::string loot_options::get_zone_name_suggestion() const
-{
-    if( !mark.empty() ) {
-        return string_format( _( "Loot: Custom: %s" ), mark );
-    }
-    return _( "Loot: Custom: No Filter" );
-}
-
-std::string unload_options::get_zone_name_suggestion() const
-{
-    return string_format( "%s%s%s%s", _( "Unload: " ), mods ? _( "mods, " ) : "",
-                          molle ? _( "MOLLE, " ) : "",
-                          always_unload ? _( "unload all" ) : _( "unload unmatched" ) );
-}
-
-std::vector<std::pair<std::string, std::string>> loot_options::get_descriptions() const
-{
-    std::vector<std::pair<std::string, std::string>> options;
-    options.emplace_back( _( "Loot: Custom: " ),
-                          !mark.empty() ? mark : _( "No filter" ) );
-
-    return options;
-}
-
-std::vector<std::pair<std::string, std::string>> unload_options::get_descriptions() const
-{
-    std::vector<std::pair<std::string, std::string>> options;
-    options.emplace_back( _( "Unload: " ),
-                          string_format( "%s%s%s", mods ? _( "mods " ) : "",  molle ? _( "MOLLE " ) : "",
-                                         always_unload ? _( "unload all" ) : _( "unload unmatched" ) ) );
-
-    return options;
-}
-
-void loot_options::serialize( JsonOut &json ) const
-{
-    json.member( "mark", mark );
-}
-
-void loot_options::deserialize( const JsonObject &jo_zone )
-{
-    jo_zone.read( "mark", mark );
-}
-
-void unload_options::serialize( JsonOut &json ) const
-{
-    json.member( "mark", mark );
-    json.member( "mods", mods );
-    json.member( "molle", molle );
-    json.member( "always_unload", always_unload );
-}
-
-void unload_options::deserialize( const JsonObject &jo_zone )
-{
-    jo_zone.read( "mark", mark );
-    jo_zone.read( "mods", mods );
-    jo_zone.read( "molle", molle );
-    jo_zone.read( "always_unload", always_unload );
-}
-
 bool blueprint_options::query_at_creation()
 {
     return query_con() != canceled;
+}
+
+bool ignorable_options::query_at_creation()
+{
+    return query_ignorable() != canceled;
+}
+
+bool loot_options::query_at_creation()
+{
+    return query_loot() != canceled;
 }
 
 bool plot_options::query_at_creation()
@@ -446,14 +375,34 @@ bool plot_options::query_at_creation()
     return query_seed() != canceled;
 }
 
+bool unload_options::query_at_creation()
+{
+    return query_unload() != canceled;
+}
+
 bool blueprint_options::query()
 {
     return query_con() == changed;
 }
 
+bool ignorable_options::query()
+{
+    return query_ignorable() == changed;
+}
+
+bool loot_options::query()
+{
+    return query_loot() == changed;
+}
+
 bool plot_options::query()
 {
     return query_seed() == changed;
+}
+
+bool unload_options::query()
+{
+    return query_unload() == changed;
 }
 
 std::string blueprint_options::get_zone_name_suggestion() const
@@ -463,6 +412,14 @@ std::string blueprint_options::get_zone_name_suggestion() const
     }
 
     return _( "No construction" );
+}
+
+std::string loot_options::get_zone_name_suggestion() const
+{
+    if( !mark.empty() ) {
+        return string_format( _( "Loot: Custom: %s" ), mark );
+    }
+    return _( "Loot: Custom: No Filter" );
 }
 
 std::string plot_options::get_zone_name_suggestion() const
@@ -480,6 +437,16 @@ std::string plot_options::get_zone_name_suggestion() const
     return _( "No seed" );
 }
 
+std::string unload_options::get_zone_name_suggestion() const
+{
+
+    return string_format( "%s%s%s%s%s", _( "Unload: " ),
+                          mods ? _( "mods, " ) : "",
+                          molle ? _( "MOLLE, " ) : "",
+                          sparse_only ? string_format( _( "ignore stacks over %i, " ), sparse_threshold ) : "",
+                          always_unload ? _( "unload all" ) : _( "unload unmatched" ) );
+}
+
 std::vector<std::pair<std::string, std::string>> blueprint_options::get_descriptions() const
 {
     std::vector<std::pair<std::string, std::string>> options =
@@ -490,12 +457,42 @@ std::vector<std::pair<std::string, std::string>> blueprint_options::get_descript
     return options;
 }
 
+std::vector<std::pair<std::string, std::string>> ignorable_options::get_descriptions() const
+{
+    std::vector<std::pair<std::string, std::string>> options;
+    options.emplace_back( _( "Ignore contents: " ),
+                          string_format( "%s", ignore_contents ? _( "True" ) : _( "False" ) ) );
+    return options;
+}
+
+std::vector<std::pair<std::string, std::string>> loot_options::get_descriptions() const
+{
+    std::vector<std::pair<std::string, std::string>> options;
+    options.emplace_back( _( "Filter: " ),
+                          !mark.empty() ? mark : _( "No filter" ) );
+
+    return options;
+}
+
 std::vector<std::pair<std::string, std::string>> plot_options::get_descriptions() const
 {
     auto options = std::vector<std::pair<std::string, std::string>>();
     options.emplace_back(
         _( "Plant seed: " ),
         !seed.is_empty() ? item::nname( itype_id( seed ) ) : _( "No seed" ) );
+
+    return options;
+}
+
+std::vector<std::pair<std::string, std::string>> unload_options::get_descriptions() const
+{
+    std::vector<std::pair<std::string, std::string>> options;
+    options.emplace_back( _( "Unload: " ),
+                          string_format( "%s%s%s%s",
+                                         mods ? _( "mods " ) : "",
+                                         molle ? _( "MOLLE " ) : "",
+                                         sparse_only ? string_format( _( "ignore stacks over %i, " ), sparse_threshold ) : "",
+                                         always_unload ? _( "unload all" ) : _( "unload unmatched" ) ) );
 
     return options;
 }
@@ -519,6 +516,26 @@ void blueprint_options::deserialize( const JsonObject &jo_zone )
     }
 }
 
+void ignorable_options::serialize( JsonOut &json ) const
+{
+    json.member( "ignore_contents", ignore_contents );
+}
+
+void ignorable_options::deserialize( const JsonObject &jo_zone )
+{
+    jo_zone.read( "ignore_contents", ignore_contents );
+}
+
+void loot_options::serialize( JsonOut &json ) const
+{
+    json.member( "mark", mark );
+}
+
+void loot_options::deserialize( const JsonObject &jo_zone )
+{
+    jo_zone.read( "mark", mark );
+}
+
 void plot_options::serialize( JsonOut &json ) const
 {
     json.member( "mark", mark );
@@ -529,6 +546,26 @@ void plot_options::deserialize( const JsonObject &jo_zone )
 {
     jo_zone.read( "mark", mark );
     jo_zone.read( "seed", seed );
+}
+
+void unload_options::serialize( JsonOut &json ) const
+{
+    json.member( "mark", mark );
+    json.member( "mods", mods );
+    json.member( "molle", molle );
+    json.member( "sparse_only", sparse_only );
+    json.member( "sparse_threshold", sparse_threshold );
+    json.member( "always_unload", always_unload );
+}
+
+void unload_options::deserialize( const JsonObject &jo_zone )
+{
+    jo_zone.read( "mark", mark );
+    jo_zone.read( "mods", mods );
+    jo_zone.read( "molle", molle );
+    jo_zone.read( "sparse_only", sparse_only );
+    jo_zone.read( "sparse_threshold", sparse_threshold );
+    jo_zone.read( "always_unload", always_unload );
 }
 
 std::optional<std::string> zone_manager::query_name( const std::string &default_name ) const
@@ -635,8 +672,18 @@ void zone_data::set_position( const std::pair<tripoint, tripoint> &position,
         debugmsg( "Tried moving a lootzone bound to a vehicle part" );
         return;
     }
+    bool displayed = is_displayed;
+
+    if( displayed ) {
+        toggle_display();
+    }
+
     start = position.first;
     end = position.second;
+
+    if( displayed ) {
+        toggle_display();
+    }
 
     if( !skip_cache_update ) {
         zone_manager::get_manager().cache_data( update_avatar );
@@ -652,6 +699,125 @@ void zone_data::set_enabled( const bool enabled_arg )
 void zone_data::set_temporary_disabled( const bool enabled_arg )
 {
     temporarily_disabled = enabled_arg;
+}
+
+// This operations can presumably be defined using templates. It should also already exist somewhere else.
+static std::pair<tripoint_abs_ms, tripoint_abs_ms> get_corners( tripoint_abs_ms a,
+        tripoint_abs_ms b )
+{
+    const tripoint_abs_ms start = tripoint_abs_ms( std::min( a.x(), b.x() ), std::min( a.y(), b.y() ),
+                                  std::min( a.z(), b.z() ) );
+    const tripoint_abs_ms end = tripoint_abs_ms( std::max( a.x(), b.x() ), std::max( a.y(), b.y() ),
+                                std::max( a.z(), b.z() ) );
+    return { start, end };
+}
+
+void zone_data::refresh_display() const
+{
+    if( this->is_vehicle ) {
+        popup( colorize( _( "Zones tied to vehicles cannot be displayed" ), c_magenta ) );
+        return;
+    }
+
+    std::unique_ptr<tinymap> p_update_tmap = std::make_unique<tinymap>();
+    tinymap &update_tmap = *p_update_tmap;
+
+    std::pair<tripoint_abs_ms, tripoint_abs_ms> bounds = get_corners( get_start_point(),
+            get_end_point() );
+    const tripoint_abs_ms start = bounds.first;
+    const tripoint_abs_ms end = bounds.second;
+
+    const tripoint_abs_omt omt_start_pos = coords::project_to<coords::omt>( start );
+    const tripoint_abs_omt omt_end_pos = coords::project_to<coords::omt>( end );
+    const tripoint_omt_ms start_remainder = tripoint_omt_ms( ( get_start_point() - coords::project_to
+                                            < coords::ms >
+                                            ( omt_start_pos ) ).raw() );
+    const tripoint_omt_ms end_remainder = tripoint_omt_ms( ( get_end_point() - coords::project_to
+                                          < coords::ms >
+                                          ( omt_end_pos ) ).raw() );
+
+    zone_type_id type = this->get_type();
+
+    field_type_str_id field = fd_null;
+    static const std::vector<zone_type> &all_zone_types = zone_type::get_all();
+    for( const zone_type &zone : all_zone_types ) {
+        if( zone.id == type ) {
+            field = zone.get_field();
+            break;
+        }
+    }
+
+    if( field != fd_null ) {
+        tripoint_omt_ms start_ms;
+        tripoint_omt_ms end_ms;
+
+        for( int i = omt_start_pos.x(); i <= omt_end_pos.x(); i++ ) {
+            for( int k = omt_start_pos.y(); k <= omt_end_pos.y(); k++ ) {
+                //  We assume the Z coordinate will remain fixed
+                update_tmap.load( tripoint_abs_omt{ i, k, omt_start_pos.z() }, false );
+
+                start_ms = tripoint_omt_ms( i > omt_start_pos.x() ? 0 : start_remainder.x(),
+                                            k > omt_start_pos.y() ? 0 : start_remainder.y(), start_remainder.z() );
+                end_ms = tripoint_omt_ms( i < omt_end_pos.x() ? SEEX * 2 - 1 : end_remainder.x(),
+                                          k < omt_end_pos.y() ? SEEY * 2 - 1 : end_remainder.y(), end_remainder.z() );
+
+                for( tripoint_omt_ms pt : update_tmap.points_in_rectangle( start_ms, end_ms ) ) {
+                    if( is_displayed ) {
+                        update_tmap.add_field( pt, field, 1, time_duration::from_turns( 0 ), false );
+                    } else {
+                        update_tmap.delete_field( pt, field );
+                    }
+                }
+            }
+        }
+    }
+}
+
+void zone_data::toggle_display()
+{
+    if( this->is_vehicle ) {
+        popup( colorize( _( "Zones tied to vehicles cannot be displayed" ), c_magenta ) );
+        return;
+    }
+
+    is_displayed = !is_displayed;
+
+    this->refresh_display();
+
+    // Take care of the situation where parts of overlapping zones were erased by the toggling.
+    if( !is_displayed ) {
+
+        const point_abs_ms start = point_abs_ms( std::min( this->start.x, this->end.x ),
+                                   std::min( this->start.y, this->end.y ) );
+
+        const point_abs_ms end = point_abs_ms( std::max( this->start.x, this->end.x ),
+                                               std::max( this->start.y, this->end.y ) );
+
+        const inclusive_rectangle<point_abs_ms> zone_rectangle( start, end );
+
+        for( zone_manager::ref_zone_data zone : zone_manager::get_manager().get_zones() ) {
+            // Assumes zones are a single Z level only. Also, inclusive_cuboid doesn't have an overlap function...
+            if( zone.get().get_is_displayed() && zone.get().get_type() == this->get_type() &&
+                this->start.z == zone.get().get_start_point().z() ) {
+                const point_abs_ms candidate_begin = zone.get().get_start_point().xy();
+                const point_abs_ms candidate_stop = zone.get().get_end_point().xy();
+
+                const point_abs_ms candidate_start = point_abs_ms( std::min( candidate_begin.x(),
+                                                     candidate_stop.x() ),
+                                                     std::min( candidate_begin.y(), candidate_stop.y() ) );
+
+                const point_abs_ms candidate_end = point_abs_ms( std::max( candidate_begin.x(),
+                                                   candidate_stop.x() ),
+                                                   std::max( candidate_begin.y(), candidate_stop.y() ) );
+
+                const inclusive_rectangle<point_abs_ms> candidate_rectangle( candidate_start, candidate_end );
+
+                if( zone_rectangle.overlaps( candidate_rectangle ) ) {
+                    zone.get().refresh_display();
+                }
+            }
+        }
+    }
 }
 
 void zone_data::set_is_vehicle( const bool is_vehicle_arg )
@@ -1059,8 +1225,8 @@ zone_type_id zone_manager::get_near_zone_type_for_item( const item &it,
         }
     }
     if( it.typeId() == itype_disassembly ) {
-        if( has_near( zone_type_zone_disassemble, where, range, fac ) ) {
-            return zone_type_zone_disassemble;
+        if( has_near( zone_type_DISASSEMBLE, where, range, fac ) ) {
+            return zone_type_DISASSEMBLE;
         }
     }
 
@@ -1075,6 +1241,7 @@ zone_type_id zone_manager::get_near_zone_type_for_item( const item &it,
     }
 
     if( cat.get_id() == item_category_food ) {
+
         const item *it_food = nullptr;
         bool perishable = false;
         // Look for food, and whether any contents which will spoil if left out.
@@ -1102,18 +1269,31 @@ zone_type_id zone_manager::get_near_zone_type_for_item( const item &it,
         if( it_food != nullptr ) {
             if( it_food->get_comestible()->comesttype == "DRINK" ) {
                 if( perishable && has_near( zone_type_LOOT_PDRINK, where, range, fac ) ) {
-                    return zone_type_LOOT_PDRINK;
+                    if( !get_near( zone_type_LOOT_PDRINK, where, range, &it, fac ).empty() ) {
+                        return zone_type_LOOT_PDRINK;
+                    }
                 } else if( has_near( zone_type_LOOT_DRINK, where, range, fac ) ) {
-                    return zone_type_LOOT_DRINK;
+                    if( !get_near( zone_type_LOOT_DRINK, where, range, &it, fac ).empty() ) {
+                        return zone_type_LOOT_DRINK;
+                    }
                 }
             }
 
             if( perishable && has_near( zone_type_LOOT_PFOOD, where, range, fac ) ) {
-                return zone_type_LOOT_PFOOD;
+                if( !get_near( zone_type_LOOT_PFOOD, where, range, &it, fac ).empty() ) {
+                    return zone_type_LOOT_PFOOD;
+                }
             }
         }
+        if( !get_near( zone_type_LOOT_FOOD, where, range, &it, fac ).empty() ) {
+            return zone_type_LOOT_FOOD;
+        }
+    }
 
-        return zone_type_LOOT_FOOD;
+    if( has_near( zone_type_LOOT_DEFAULT, where, range, fac ) ) {
+        if( !get_near( zone_type_LOOT_DEFAULT, where, range, &it, fac ).empty() ) {
+            return zone_type_LOOT_DEFAULT;
+        }
     }
 
     return zone_type_id();
@@ -1242,6 +1422,9 @@ bool zone_manager::remove( zone_data &zone )
 {
     for( auto it = zones.begin(); it != zones.end(); ++it ) {
         if( &zone == &*it ) {
+            if( zone.get_is_displayed() ) {
+                zone.toggle_display();
+            }
             // if removing a personal zone reduce the number of counted personal zones
             if( it->get_is_personal() ) {
                 num_personal_zones--;
@@ -1407,6 +1590,7 @@ void zone_manager::deserialize( const JsonValue &jv )
             num_personal_zones++;
         }
         const zone_type_id zone_type = it->get_type();
+
         if( !has_type( zone_type ) ) {
             it = zones.erase( it );
             debugmsg( "Invalid zone type: %s", zone_type.c_str() );
@@ -1431,6 +1615,7 @@ void zone_data::serialize( JsonOut &json ) const
     json.member( "cached_shift", cached_shift );
     json.member( "start", start );
     json.member( "end", end );
+    json.member( "is_displayed", is_displayed );
     options->serialize( json );
     json.end_object();
 }
@@ -1439,7 +1624,15 @@ void zone_data::deserialize( const JsonObject &data )
 {
     data.allow_omitted_members();
     data.read( "name", name );
-    data.read( "type", type );
+    // handle legacy zone types
+    zone_type_id temp_type;
+    data.read( "type", temp_type );
+    const auto find_result = legacy_zone_types.find( temp_type.str() );
+    if( find_result != legacy_zone_types.end() ) {
+        type =  find_result->second;
+    } else {
+        type = temp_type;
+    }
     if( data.has_member( "faction" ) ) {
         data.read( "faction", faction );
     } else {
@@ -1475,6 +1668,11 @@ void zone_data::deserialize( const JsonObject &data )
     } else {
         data.read( "start", start );
         data.read( "end", end );
+    }
+    if( data.has_member( "is_displayed" ) ) {
+        data.read( "is_displayed", is_displayed );
+    } else {
+        is_displayed = false;
     }
     auto new_options = zone_options::create( type );
     new_options->deserialize( data );
@@ -1606,7 +1804,9 @@ void mapgen_place_zone( tripoint const &start, tripoint const &end, zone_type_id
     tripoint const s_ = std::min( start, end );
     tripoint const e_ = std::max( start, end );
     if( type == zone_type_LOOT_CUSTOM || type == zone_type_LOOT_ITEM_GROUP ) {
-        dynamic_cast<loot_options *>( &*options )->set_mark( filter );
+        if( dynamic_cast<loot_options *>( &*options ) != nullptr ) {
+            dynamic_cast<loot_options *>( &*options )->set_mark( filter );
+        }
     }
     mgr.add( name, type, fac, false, true, s_, e_, options, false, true, pmap );
 }

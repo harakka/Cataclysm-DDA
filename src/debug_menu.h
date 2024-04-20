@@ -5,13 +5,12 @@
 #include <cstddef>
 #include <functional>
 #include <optional>
-#include <iosfwd>
-#include <string> // IWYU pragma: keep
-
-struct tripoint;
-template <typename E> struct enum_traits;
+#include <string>
+#include <string_view>
 
 class Character;
+struct tripoint;
+template <typename E> struct enum_traits;
 
 namespace debug_menu
 {
@@ -81,7 +80,6 @@ enum class debug_menu_index : int {
     DISPLAY_VISIBILITY,
     DISPLAY_LIGHTING,
     DISPLAY_TRANSPARENCY,
-    DISPLAY_REACHABILITY_ZONES,
     DISPLAY_RADIATION,
     HOUR_TIMER,
     CHANGE_SPELLS,
@@ -91,7 +89,6 @@ enum class debug_menu_index : int {
     VEHICLE_DELETE,
     VEHICLE_EXPORT,
     GENERATE_EFFECT_LIST,
-    EDIT_CAMP_LARDER,
     WRITE_GLOBAL_EOCS,
     WRITE_GLOBAL_VARS,
     EDIT_GLOBAL_VARS,
@@ -102,6 +99,11 @@ enum class debug_menu_index : int {
     EXPORT_FOLLOWER,
     EXPORT_SELF,
     QUICK_SETUP,
+    TOGGLE_SETUP_MUTATION,
+    NORMALIZE_BODY_STAT,
+    SIX_MILLION_DOLLAR_SURVIVOR,
+    EDIT_FACTION,
+    WRITE_CITY_LIST,
     last
 };
 
@@ -111,7 +113,14 @@ void wishitem( Character *you, const tripoint & );
 void wishmonster( const std::optional<tripoint> &p );
 void wishmutate( Character *you );
 void wishbionics( Character *you );
+/*
+ * Set skill on any Character object; player character or NPC
+ * Can change skill theory level
+ */
 void wishskill( Character *you, bool change_theory = false );
+/*
+ * Set proficiency on any Character object; player character or NPC
+ */
 void wishproficiency( Character *you );
 
 void debug();

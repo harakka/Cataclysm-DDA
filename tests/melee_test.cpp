@@ -22,10 +22,10 @@ static const efftype_id effect_sleep( "sleep" );
 
 static const move_mode_id move_mode_prone( "prone" );
 
-static const mtype_id debug_mon( "debug_mon" );
 static const mtype_id mon_manhack( "mon_manhack" );
 static const mtype_id mon_zombie( "mon_zombie" );
 static const mtype_id mon_zombie_hulk( "mon_zombie_hulk" );
+static const mtype_id pseudo_debug_mon( "pseudo_debug_mon" );
 
 static const skill_id skill_melee( "melee" );
 
@@ -290,7 +290,7 @@ TEST_CASE( "Incapacited_character_can_not_dodge" )
 TEST_CASE( "Melee_skill_training_caps", "[melee], [melee_training_cap], [skill]" )
 {
     standard_npc dude( "TestCharacter", dude_pos, {} );
-    monster dummy_1( debug_mon );
+    monster dummy_1( pseudo_debug_mon );
     monster zed( mon_zombie );
     SkillLevel &level = dude.get_skill_level_object( skill_melee );
     REQUIRE( level.knowledgeLevel() == 4 );
@@ -365,14 +365,18 @@ static void check_eocs_from_test_fire( const std::string &mon_id )
     REQUIRE( mon.get_value( "npctalk_var_general_dmg_type_test_test_fire" ).empty() );
     item firesword( "test_fire_sword" );
     dude.set_wielded_item( firesword );
-    while( !dude.melee_attack( mon, false ) ) {}
+    for( int i = 0; i < 1000; ++i ) {
+        if( dude.melee_attack( mon, false ) && !dude.get_value( "npctalk_var_test_bp" ).empty() ) {
+            break;
+        }
+    }
+    CHECK( !dude.get_value( "npctalk_var_test_bp" ).empty() );
     if( mon.get_value( "npctalk_var_general_dmg_type_test_test_fire" ) == "target" ) {
         REQUIRE( dude.get_value( "npctalk_var_general_dmg_type_test_test_fire" ) == "source" );
     }
 
     eoc_total_dmg = std::round( std::stod(
                                     dude.get_value( "npctalk_var_test_damage_taken" ) ) );
-    REQUIRE( !dude.get_value( "npctalk_var_test_bp" ).empty() );
 
     Messages::clear_messages();
     CHECK( eoc_total_dmg == firesword.damage_melee( damage_test_fire ) );

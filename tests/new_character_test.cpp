@@ -1,4 +1,3 @@
-#include <functional>
 #include <cstddef>
 #include <functional>
 #include <list>
@@ -156,7 +155,7 @@ TEST_CASE( "starting_items", "[slow]" )
                     continue; // Trait conflict: this prof/scen/trait combo is impossible to attain
                 }
                 for( int i = 0; i < 2; i++ ) {
-                    player_character.worn.clear();
+                    player_character.clear_worn();
                     player_character.remove_weapon();
                     player_character.inv->clear();
                     player_character.calc_encumbrance();

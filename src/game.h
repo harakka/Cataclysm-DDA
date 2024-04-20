@@ -7,12 +7,12 @@
 #include <ctime>
 #include <functional>
 #include <iosfwd>
-#include <list>
+#include <map>
 #include <memory>
-#include <queue>
-#include <new>
 #include <optional>
 #include <set>
+#include <string>
+#include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -20,6 +20,7 @@
 #include "calendar.h"
 #include "character.h"
 #include "character_id.h"
+#include "color.h"
 #include "coordinates.h"
 #include "creature.h"
 #include "cursesdef.h"
@@ -28,22 +29,11 @@
 #include "global_vars.h"
 #include "item_location.h"
 #include "memory_fast.h"
-#include "monster.h"
 #include "pimpl.h"
 #include "point.h"
 #include "type_id.h"
-#include "uistate.h"
 #include "units_fwd.h"
 #include "weather.h"
-
-class Character;
-class creature_tracker;
-class JsonValue;
-class item;
-class location;
-class eoc_events;
-class spell_events;
-class viewer;
 
 constexpr int DEFAULT_TILESET_ZOOM = 16;
 
@@ -76,32 +66,40 @@ enum safe_mode_type {
 
 enum action_id : int;
 
+class JsonValue;
 class achievements_tracker;
 class avatar;
+class cata_path;
+class creature_tracker;
+class eoc_events;
 class event_bus;
 class faction_manager;
+class field_entry;
+class item;
 class kill_tracker;
+class live_view;
+class loading_ui;
 class map;
 class map_item_stack;
 class memorial_logger;
+class monster;
 class npc;
+class npc_template;
+class overmap;
 class save_t;
 class scenario;
-class stats_tracker;
-class vehicle;
-struct WORLD;
-struct special_game;
-template<typename Tripoint>
-class tripoint_range;
-class exosuit_interact;
-class live_view;
-class loading_ui;
-class overmap;
 class scent_map;
+class spell_events;
 class static_popup;
+class stats_tracker;
 class timed_event_manager;
 class ui_adaptor;
+class uilist;
+class vehicle;
+class viewer;
+struct special_game;
 struct visibility_variables;
+template <typename Tripoint> class tripoint_range;
 
 using item_filter = std::function<bool ( const item & )>;
 using item_location_filter = std::function<bool ( const item_location & )>;
@@ -122,6 +120,7 @@ struct look_around_params {
     bool has_first_point;
     bool select_zone;
     bool peeking;
+    bool change_lv;
 };
 
 struct w_map {
@@ -480,6 +479,7 @@ class game
          * are checked ( and returned ). Returned pointers are never null.
          */
         std::vector<Creature *> get_creatures_if( const std::function<bool( const Creature & )> &pred );
+        std::vector<Character *> get_characters_if( const std::function<bool( const Character & )> &pred );
         std::vector<npc *> get_npcs_if( const std::function<bool( const npc & )> &pred );
         /**
          * Returns a creature matching a predicate. Only living (not dead) creatures
@@ -508,6 +508,8 @@ class game
          * If reviving failed, the item is unchanged, as is the environment (no new monsters).
          */
         bool revive_corpse( const tripoint &p, item &it );
+        // same as above, but with relaxed placement radius.
+        bool revive_corpse( const tripoint &p, item &it, int radius );
         /**Turns Broken Cyborg monster into Cyborg NPC via surgery*/
         void save_cyborg( item *cyborg, const tripoint &couch_pos, Character &installer );
         /** Asks if the player wants to cancel their activity, and if so cancels it. */
@@ -636,11 +638,13 @@ class game
         * @param peeking determines if the player is peeking
         * @param is_moving_zone true if the zone is being moved, false by default
         * @param end_point the end point of the targeting zone, only used if is_moving_zone is true, default is tripoint_zero
+        * @param change_lv determines allow if change z-level
         * @return look_around_result
         */
         look_around_result look_around( bool show_window, tripoint &center,
                                         const tripoint &start_point, bool has_first_point, bool select_zone, bool peeking,
-                                        bool is_moving_zone = false, const tripoint &end_point = tripoint_zero );
+                                        bool is_moving_zone = false, const tripoint &end_point = tripoint_zero,
+                                        bool change_lv = true );
         look_around_result look_around( look_around_params );
 
         // Shared method to print "look around" info
@@ -738,7 +742,9 @@ class game
 
         /**@}*/
 
+        // TODO: Get rid of untyped overload.
         void open_gate( const tripoint &p );
+        void open_gate( const tripoint_bub_ms &p );
 
         // Knockback functions: knock target at t along a line, either calculated
         // from source position s using force parameter or passed as an argument;
@@ -818,7 +824,9 @@ class game
         // will do so, if bash_dmg is greater than 0, items won't stop the door
         // from closing at all.
         // If the door gets closed the items on the door tile get moved away or destroyed.
+        // TODO: Get rid of untyped overload.
         bool forced_door_closing( const tripoint &p, const ter_id &door_type, int bash_dmg );
+        bool forced_door_closing( const tripoint_bub_ms &p, const ter_id &door_type, int bash_dmg );
 
         /** Attempt to load first valid save (if any) in world */
         bool load( const std::string &world );
@@ -902,6 +910,8 @@ class game
         void reload_item(); // Reload an item
         void reload_wielded( bool prompt = false );
         void reload_weapon( bool try_everything = true ); // Reload a wielded gun/tool  'r'
+        void insert_item(); // Insert items to container  'v'
+        void insert_item( drop_locations &targets );
         // Places the player at the specified point; hurts feet, lists items etc.
         point place_player( const tripoint &dest, bool quick = false );
         void place_player_overmap( const tripoint_abs_omt &om_dest, bool move_player = true );
@@ -1047,6 +1057,7 @@ class game
 
         void move_save_to_graveyard();
         bool save_player_data();
+        bool save_achievements();
         // ########################## DATA ################################
         // May be a bit hacky, but it's probably better than the header spaghetti
         pimpl<map> map_ptr; // NOLINT(cata-serialize)
@@ -1062,7 +1073,6 @@ class game
         pimpl<memorial_logger> memorial_logger_ptr; // NOLINT(cata-serialize)
         pimpl<spell_events> spell_events_ptr; // NOLINT(cata-serialize)
         pimpl<eoc_events> eoc_events_ptr; // NOLINT(cata-serialize)
-
 
         map &m;
         avatar &u;
@@ -1083,14 +1093,6 @@ class game
         void unique_npc_despawn( const std::string &id );
         std::vector<effect_on_condition_id> inactive_global_effect_on_condition_vector;
         queued_eocs queued_global_effect_on_conditions;
-
-        // setting that specifies which reachability zone cache to display
-        struct debug_reachability_zones_display {
-            public:
-                bool r_cache_vertical;
-                reachability_cache_quadrant quadrant;
-        } debug_rz_display = {}; // NOLINT(cata-serialize)
-        void display_reachability_zones(); // Displays reachability zones
 
         spell_events &spell_events_subscriber();
 
@@ -1226,17 +1228,53 @@ class game
         // called on map shifting
         void shift_destination_preview( const point &delta );
 
-        /**
-        Checks if player is able to successfully climb to/from some terrain and not slip down
-        @param check_for_traps Used if needed to call trap function on player's location after slipping down
-        @return whether player has slipped down
+        /** Passed to climbing-related functions (slip_down) to
+        *   indicate the climbing action being attempted.
         */
-        bool slip_down( bool check_for_traps = false );
+        enum class climb_maneuver {
+            down,          // climb up one Z-level
+            up,            // climb down one Z-level
+            over_obstacle, // climb over an obstacle (horizontal move)
+        };
 
         /**
-        * Climb down from a ledge using grappling hooks or spider webs if appropriate.
+        Checks if player is able to successfully climb to/from some terrain and not slip down
+        @param maneuver Type & direction of climbing maneuver.  Affects chance and whether traps trigger.
+        @param aid Identifies the object, terrain or ability being used to climb.  See climbing.h.
+        @param show_chance_messages If true, adds explanatory messages to the log when calculating fall chance.
+        @return whether player has slipped down
+        */
+        bool slip_down(
+            climb_maneuver maneuver,
+            climbing_aid_id aid = climbing_aid_id::NULL_ID(),
+            bool show_chance_messages = true );
+
+        /**
+        Calculates the chance that slip_down will return true.
+        @param maneuver Type & direction of climbing maneuver.  Affects chance and whether traps trigger.
+        @param affordance Identifies the object, terrain or ability being used to climb.  See climbing.h.
+        @param show_messages If true, outputs climbing chance factors to the message log as if attempting.
+        @return Probability, as a percentage, that player will slip down while climbing some terrain.
+        */
+        int slip_down_chance(
+            climb_maneuver maneuver,
+            climbing_aid_id aid = climbing_aid_id::NULL_ID(),
+            bool show_chance_messages = true );
+
+        /**
+        * Climb down from a ledge.
+        * Player is prompted to deploy grappling hook, webs or detach vines if applicable.
+        * Otherwise the safest available affordance (see above) is detected and used.
+        * The player is shown a confirmation query with an assessment of falling risk and damage.
         */
         void climb_down( const tripoint &examp );
+
+        void climb_down_menu_gen( const tripoint &examp, uilist &cmenu );
+        bool climb_down_menu_pick( const tripoint &examp, int retval );
+        void climb_down_using(
+            const tripoint &examp,
+            climbing_aid_id aid,
+            bool deploy_affordance = false );
 };
 
 // Returns temperature modifier from direct heat radiation of nearby sources

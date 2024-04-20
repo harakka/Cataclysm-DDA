@@ -2,19 +2,30 @@
 #ifndef CATA_SRC_EFFECT_ON_CONDITION_H
 #define CATA_SRC_EFFECT_ON_CONDITION_H
 
+#include <functional>
+#include <map>
+#include <memory>
 #include <string>
-#include <climits>
-#include <optional>
+#include <string_view>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
-#include "calendar.h"
-#include "condition.h"
 #include "dialogue.h"
+#include "dialogue_helpers.h"
 #include "event.h"
-#include "json.h"
+#include "event_subscriber.h"
 #include "type_id.h"
 
-template<typename T>
-class generic_factory;
+class Character;
+class JsonObject;
+class JsonValue;
+class talker;
+class time_duration;
+struct effect_on_condition;
+template <typename E> struct enum_traits;
+template <typename T> class generic_factory;
+
 enum eoc_type {
     ACTIVATION,
     RECURRING,
@@ -31,6 +42,7 @@ class eoc_events : public event_subscriber
 {
     public:
         void notify( const cata::event &e ) override;
+        void notify( const cata::event &, std::unique_ptr<talker>, std::unique_ptr<talker> ) override;
         void clear();
 
     private:
@@ -58,7 +70,7 @@ struct effect_on_condition {
         bool has_false_effect = false;
         event_type required_event;
         duration_or_var recurrence;
-        bool activate( dialogue &d ) const;
+        bool activate( dialogue &d, bool require_callstack_check = true ) const;
         bool check_deactivate( dialogue &d ) const;
         bool test_condition( dialogue &d ) const;
         void apply_true_effects( dialogue &d ) const;

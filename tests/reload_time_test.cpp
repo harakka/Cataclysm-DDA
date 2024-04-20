@@ -36,9 +36,9 @@ static void check_reload_time( const std::string &weapon, const std::string &amm
     CAPTURE( shooter.item_handling_cost( *shooter.used_weapon(), true, 0 ) );
     CAPTURE( shooter.used_weapon()->get_reload_time() );
     aim_activity_actor act = aim_activity_actor::use_wielded();
-    int moves_before = shooter.moves;
+    int moves_before = shooter.get_moves();
     REQUIRE( act.load_RAS_weapon() );
-    int moves_after = shooter.moves;
+    int moves_after = shooter.get_moves();
     int spent_moves = moves_before - moves_after;
     int expected_upper = expected_moves * 1.05;
     int expected_lower = expected_moves * 0.95;
@@ -86,13 +86,13 @@ TEST_CASE( "reload_from_inventory_times", "[reload],[inventory],[balance]" )
     }
     SECTION( "reloading a bow" ) {
         SECTION( "from a duffel bag" ) {
-            check_reload_time( "longbow", "arrow_wood", "long_duffelbag", 350 );
+            check_reload_time( "longbow", "arrow_wood", "long_duffelbag", 360 );
         }
         SECTION( "from a quiver" ) {
-            check_reload_time( "longbow", "arrow_wood", "quiver", 70 );
+            check_reload_time( "longbow", "arrow_wood", "quiver", 80 );
         }
         SECTION( "from the ground" ) {
-            check_reload_time( "longbow", "arrow_wood", "", 130 );
+            check_reload_time( "longbow", "arrow_wood", "", 140 );
         }
     }
 }

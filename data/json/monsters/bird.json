@@ -1,5 +1,50 @@
 [
   {
+    "abstract": "mon_bird_flying_base",
+    "type": "MONSTER",
+    "name": { "str": "flying bird abstract" },
+    "description": "This is an abstract monsters for other wild flying birds to copy from, so that we have some common foundation to work with.  If it appears in the game that's a bug.",
+    "bodytype": "bird",
+    "default_faction": "small_animal",
+    "categories": [ "WILDLIFE" ],
+    "species": [ "BIRD" ],
+    "volume": "600 ml",
+    "weight": "450 g",
+    "//": "0.75g/ml density for most wild flying birds",
+    "hp": 4,
+    "speed": 200,
+    "material": [ "flesh" ],
+    "symbol": "v",
+    "color": "dark_gray",
+    "aggression": -99,
+    "morale": 5,
+    "melee_dice": 1,
+    "melee_dice_sides": 1,
+    "melee_damage": [ { "damage_type": "cut", "amount": 0 } ],
+    "dodge": 4,
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_flying", "prof_wp_basic_bird" ],
+    "weakpoint_sets": [ "wps_bird_body" ],
+    "harvest": "bird_tiny",
+    "dissect": "dissect_bird_sample_single",
+    "baby_flags": [ "SPRING", "SUMMER" ],
+    "fear_triggers": [ "SOUND", "PLAYER_CLOSE", "FRIEND_ATTACKED", "FRIEND_DIED", "FIRE", "HURT" ],
+    "biosignature": { "biosig_item": "feces_bird", "biosig_timer": 4 },
+    "flags": [
+      "SEES",
+      "HEARS",
+      "ANIMAL",
+      "PATH_AVOID_DANGER_1",
+      "PATH_AVOID_FIRE",
+      "WARM",
+      "FLIES",
+      "SWARMS",
+      "CANPLAY",
+      "CAN_BE_CULLED",
+      "PET_WONT_FOLLOW",
+      "SMALL_HIDER"
+    ]
+  },
+  {
     "id": "mon_chicken",
     "type": "MONSTER",
     "name": { "str": "chicken" },
@@ -22,7 +67,7 @@
     "melee_dice_sides": 1,
     "melee_damage": [ { "damage_type": "cut", "amount": 1 } ],
     "dodge": 4,
-    "families": [ "prof_intro_biology", "prof_wp_basic_bird" ],
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_basic_bird" ],
     "weakpoint_sets": [ "wps_bird_body" ],
     "harvest": "bird_tiny",
     "dissect": "dissect_bird_sample_single",
@@ -35,7 +80,18 @@
       "feed": "The %s seems to like you!  It runs around your legs and seems friendly.",
       "pet": "The %s runs around your leg."
     },
-    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "CANPLAY", "SWARMS", "CAN_BE_CULLED" ]
+    "flags": [
+      "SEES",
+      "HEARS",
+      "SMELLS",
+      "ANIMAL",
+      "PATH_AVOID_DANGER_1",
+      "WARM",
+      "CANPLAY",
+      "SWARMS",
+      "CAN_BE_CULLED",
+      "SMALL_HIDER"
+    ]
   },
   {
     "id": "mon_grouse",
@@ -74,7 +130,9 @@
     "melee_dice_sides": 1,
     "melee_damage": [ { "damage_type": "cut", "amount": 0 } ],
     "dodge": 4,
-    "families": [ "prof_intro_biology", "prof_wp_flying", "prof_wp_basic_bird" ],
+    "stomach_size": 30,
+    "special_attacks": [ [ "EAT_CARRION", 40 ], [ "EAT_FOOD", 120 ] ],
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_flying", "prof_wp_basic_bird" ],
     "weakpoint_sets": [ "wps_bird_body" ],
     "harvest": "bird_tiny",
     "dissect": "dissect_bird_sample_single",
@@ -82,7 +140,19 @@
     "reproduction": { "baby_egg": "egg_crow", "baby_count": 4, "baby_timer": 18 },
     "baby_flags": [ "SPRING" ],
     "biosignature": { "biosig_item": "feces_bird", "biosig_timer": 8 },
-    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "CANPLAY", "FLIES", "SWARMS" ]
+    "flags": [
+      "SEES",
+      "HEARS",
+      "SMELLS",
+      "ANIMAL",
+      "PATH_AVOID_DANGER_1",
+      "WARM",
+      "CANPLAY",
+      "FLIES",
+      "SWARMS",
+      "EATS",
+      "SMALL_HIDER"
+    ]
   },
   {
     "id": "mon_raven",
@@ -106,7 +176,9 @@
     "melee_dice_sides": 1,
     "melee_damage": [ { "damage_type": "cut", "amount": 0 } ],
     "dodge": 4,
-    "families": [ "prof_intro_biology", "prof_wp_flying", "prof_wp_basic_bird" ],
+    "stomach_size": 50,
+    "special_attacks": [ [ "EAT_CARRION", 40 ], [ "EAT_FOOD", 120 ] ],
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_flying", "prof_wp_basic_bird" ],
     "weakpoint_sets": [ "wps_bird_body" ],
     "harvest": "bird_tiny",
     "dissect": "dissect_bird_sample_single",
@@ -114,7 +186,19 @@
     "reproduction": { "baby_egg": "egg_raven", "baby_count": 5, "baby_timer": 18 },
     "baby_flags": [ "SPRING" ],
     "biosignature": { "biosig_item": "feces_bird", "biosig_timer": 8 },
-    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "CANPLAY", "FLIES", "SWARMS" ]
+    "flags": [
+      "SEES",
+      "HEARS",
+      "SMELLS",
+      "ANIMAL",
+      "PATH_AVOID_DANGER_1",
+      "WARM",
+      "CANPLAY",
+      "FLIES",
+      "SWARMS",
+      "EATS",
+      "SMALL_HIDER"
+    ]
   },
   {
     "id": "mon_bluejay",
@@ -138,7 +222,7 @@
     "melee_dice_sides": 1,
     "melee_damage": [ { "damage_type": "cut", "amount": 0 } ],
     "dodge": 4,
-    "families": [ "prof_intro_biology", "prof_wp_flying", "prof_wp_basic_bird" ],
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_flying", "prof_wp_basic_bird" ],
     "weakpoint_sets": [ "wps_bird_body" ],
     "harvest": "bird_tiny",
     "dissect": "dissect_bird_sample_single",
@@ -146,7 +230,7 @@
     "reproduction": { "baby_egg": "egg_bluejay", "baby_count": 5, "baby_timer": 18 },
     "baby_flags": [ "SPRING" ],
     "biosignature": { "biosig_item": "feces_bird", "biosig_timer": 8 },
-    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "CANPLAY", "FLIES", "SWARMS" ]
+    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "CANPLAY", "FLIES", "SWARMS", "SMALL_HIDER" ]
   },
   {
     "id": "mon_cardinal",
@@ -170,7 +254,7 @@
     "melee_dice_sides": 1,
     "melee_damage": [ { "damage_type": "cut", "amount": 0 } ],
     "dodge": 4,
-    "families": [ "prof_intro_biology", "prof_wp_flying", "prof_wp_basic_bird" ],
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_flying", "prof_wp_basic_bird" ],
     "weakpoint_sets": [ "wps_bird_body" ],
     "harvest": "bird_tiny",
     "dissect": "dissect_bird_sample_single",
@@ -178,7 +262,7 @@
     "reproduction": { "baby_egg": "egg_cardinal", "baby_count": 3, "baby_timer": 13 },
     "baby_flags": [ "SPRING" ],
     "biosignature": { "biosig_item": "feces_bird", "biosig_timer": 8 },
-    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES", "SWARMS" ]
+    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES", "SWARMS", "SMALL_HIDER" ]
   },
   {
     "id": "mon_robin",
@@ -202,7 +286,7 @@
     "melee_dice_sides": 1,
     "melee_damage": [ { "damage_type": "cut", "amount": 0 } ],
     "dodge": 4,
-    "families": [ "prof_intro_biology", "prof_wp_flying", "prof_wp_basic_bird" ],
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_flying", "prof_wp_basic_bird" ],
     "weakpoint_sets": [ "wps_bird_body" ],
     "harvest": "bird_tiny",
     "dissect": "dissect_bird_sample_single",
@@ -210,7 +294,7 @@
     "reproduction": { "baby_egg": "egg_robin", "baby_count": 3, "baby_timer": 14 },
     "baby_flags": [ "SPRING" ],
     "biosignature": { "biosig_item": "feces_bird", "biosig_timer": 8 },
-    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES", "SWARMS" ]
+    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES", "SWARMS", "SMALL_HIDER" ]
   },
   {
     "id": "mon_sparrow",
@@ -234,7 +318,7 @@
     "melee_dice_sides": 1,
     "melee_damage": [ { "damage_type": "cut", "amount": 0 } ],
     "dodge": 4,
-    "families": [ "prof_intro_biology", "prof_wp_flying", "prof_wp_basic_bird" ],
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_flying", "prof_wp_basic_bird" ],
     "weakpoint_sets": [ "wps_bird_body" ],
     "harvest": "bird_tiny",
     "dissect": "dissect_bird_sample_single",
@@ -242,7 +326,7 @@
     "reproduction": { "baby_egg": "egg_sparrow", "baby_count": 5, "baby_timer": 14 },
     "baby_flags": [ "SPRING" ],
     "biosignature": { "biosig_item": "feces_bird", "biosig_timer": 8 },
-    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES", "SWARMS" ]
+    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES", "SWARMS", "SMALL_HIDER" ]
   },
   {
     "id": "mon_duck",
@@ -266,7 +350,7 @@
     "melee_dice_sides": 1,
     "melee_damage": [ { "damage_type": "cut", "amount": 0 } ],
     "dodge": 4,
-    "families": [ "prof_intro_biology", "prof_wp_flying", "prof_wp_basic_bird" ],
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_flying", "prof_wp_basic_bird" ],
     "weakpoint_sets": [ "wps_bird_body" ],
     "harvest": "bird_small",
     "dissect": "dissect_bird_sample_single",
@@ -274,7 +358,7 @@
     "reproduction": { "baby_egg": "egg_duck", "baby_count": 3, "baby_timer": 5 },
     "baby_flags": [ "SPRING" ],
     "biosignature": { "biosig_item": "feces_bird", "biosig_timer": 5 },
-    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES", "SWARMS" ]
+    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES", "SWARMS", "SMALL_HIDER" ]
   },
   {
     "id": "mon_goose_canadian",
@@ -318,7 +402,7 @@
     "melee_dice_sides": 1,
     "melee_damage": [ { "damage_type": "cut", "amount": 1 } ],
     "dodge": 3,
-    "families": [ "prof_intro_biology", "prof_wp_flying", "prof_wp_basic_bird" ],
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_flying", "prof_wp_basic_bird" ],
     "weakpoint_sets": [ "wps_bird_body" ],
     "harvest": "bird_small",
     "dissect": "dissect_bird_sample_single",
@@ -327,7 +411,7 @@
     "reproduction": { "baby_egg": "egg_turkey", "baby_count": 3, "baby_timer": 12 },
     "baby_flags": [ "SPRING", "SUMMER" ],
     "biosignature": { "biosig_item": "feces_bird", "biosig_timer": 8 },
-    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES" ]
+    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES", "SMALL_HIDER" ]
   },
   {
     "id": "mon_pheasant",
@@ -347,39 +431,6 @@
     "baby_flags": [ "SPRING" ]
   },
   {
-    "id": "mon_cockatrice",
-    "type": "MONSTER",
-    "name": { "str": "cockatrice" },
-    "description": "This strange mutant bird gains its name from its odd appearance.  Although its features seem to be becoming more reptilian, it doesn't appear dangerous.",
-    "default_faction": "small_animal",
-    "bodytype": "bird",
-    "categories": [ "WILDLIFE" ],
-    "species": [ "BIRD" ],
-    "volume": "750 ml",
-    "weight": "1 kg",
-    "hp": 20,
-    "speed": 130,
-    "material": [ "flesh" ],
-    "symbol": "v",
-    "color": "red",
-    "looks_like": "mon_chicken",
-    "aggression": -50,
-    "morale": -8,
-    "melee_skill": 2,
-    "melee_dice": 2,
-    "melee_dice_sides": 1,
-    "melee_damage": [ { "damage_type": "cut", "amount": 3 } ],
-    "dodge": 6,
-    "families": [ "prof_intro_biology", "prof_wp_flying", "prof_wp_basic_bird" ],
-    "weakpoint_sets": [ "wps_bird_body" ],
-    "harvest": "bird_tiny",
-    "dissect": "dissect_chimera_sample_small",
-    "reproduction": { "baby_egg": "egg_cockatrice", "baby_count": 3, "baby_timer": 10 },
-    "baby_flags": [ "SPRING", "SUMMER", "AUTUMN" ],
-    "biosignature": { "biosig_item": "feces_bird", "biosig_timer": 8 },
-    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES" ]
-  },
-  {
     "abstract": "mon_generic_chick",
     "type": "MONSTER",
     "name": { "str": "brown chick" },
@@ -388,7 +439,7 @@
     "bodytype": "bird",
     "categories": [ "WILDLIFE" ],
     "species": [ "BIRD" ],
-    "volume": "750 ml",
+    "volume": "80 ml",
     "weight": "60 g",
     "hp": 1,
     "speed": 40,
@@ -401,13 +452,25 @@
     "melee_skill": 1,
     "melee_dice": 1,
     "melee_dice_sides": 1,
-    "melee_damage": [ { "damage_type": "cut", "amount": 1 } ],
+    "melee_damage": [ { "damage_type": "cut", "amount": 0 } ],
     "dodge": 1,
-    "families": [ "prof_intro_biology", "prof_wp_basic_bird" ],
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_basic_bird" ],
     "harvest": "bird_tiny",
     "upgrades": { "age_grow": 14, "into": "mon_chicken" },
     "//": "Grows up into a standard chicken as a fallback",
-    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "SWARMS", "CAN_BE_CULLED" ]
+    "fear_triggers": [ "SOUND", "PLAYER_CLOSE", "FRIEND_ATTACKED", "FRIEND_DIED", "FIRE", "HURT" ],
+    "flags": [
+      "SEES",
+      "HEARS",
+      "ANIMAL",
+      "PATH_AVOID_DANGER_1",
+      "PATH_AVOID_FIRE",
+      "WARM",
+      "SWARMS",
+      "CAN_BE_CULLED",
+      "CANPLAY",
+      "SMALL_HIDER"
+    ]
   },
   {
     "id": "mon_chicken_chick",
@@ -420,8 +483,7 @@
       "food": [ "BIRDFOOD" ],
       "feed": "The %s seems to like you!  It runs around your legs and seems friendly.",
       "pet": "The %s runs around your leg."
-    },
-    "extend": { "flags": [ "CANPLAY" ] }
+    }
   },
   {
     "id": "mon_grouse_chick",
@@ -439,7 +501,6 @@
       "feed": "The %s seems to like you!  It runs around your legs and seems friendly.",
       "pet": "The %s runs around your leg."
     },
-    "extend": { "flags": [ "CANPLAY" ] },
     "volume": "250 ml",
     "weight": "50 g",
     "upgrades": { "age_grow": 36, "into": "mon_crow" }
@@ -493,7 +554,6 @@
       "feed": "The %s seems to like you!  It runs around your legs and seems friendly.",
       "pet": "The %s runs around your leg."
     },
-    "extend": { "flags": [ "CANPLAY" ] },
     "upgrades": { "age_grow": 18, "into": "mon_turkey" }
   },
   {
@@ -505,22 +565,7 @@
       "feed": "The %s seems to like you!  It runs around your legs and seems friendly.",
       "pet": "The %s runs around your leg."
     },
-    "extend": { "flags": [ "CANPLAY" ] },
     "upgrades": { "age_grow": 14, "into": "mon_pheasant" }
-  },
-  {
-    "id": "mon_cockatrice_chick",
-    "type": "MONSTER",
-    "copy-from": "mon_generic_chick",
-    "description": "A strange tiny chick, it could be from a number of different species.",
-    "name": { "str": "strange chick" },
-    "petfood": {
-      "food": [ "BIRDFOOD" ],
-      "feed": "The %s seems to like you!  It runs around your legs and seems friendly.",
-      "pet": "The %s runs around your leg."
-    },
-    "extend": { "flags": [ "CANPLAY" ] },
-    "upgrades": { "age_grow": 12, "into": "mon_cockatrice" }
   },
   {
     "id": "mon_duck_chick",
@@ -533,8 +578,7 @@
       "feed": "The %s seems to like you!  It runs around your legs and seems friendly.",
       "pet": "The %s runs around your leg."
     },
-    "upgrades": { "age_grow": 12, "into": "mon_duck" },
-    "extend": { "flags": [ "CANPLAY" ] }
+    "upgrades": { "age_grow": 12, "into": "mon_duck" }
   },
   {
     "id": "mon_goose_canadian_chick",
@@ -565,15 +609,16 @@
     "melee_damage": [ { "damage_type": "cut", "amount": 2 } ],
     "melee_skill": 2,
     "dodge": 1,
-    "families": [ "prof_intro_biology", "prof_wp_flying", "prof_wp_basic_bird" ],
+    "stomach_size": 200,
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_flying", "prof_wp_basic_bird" ],
     "weakpoint_sets": [ "wps_bird_body" ],
     "harvest": "mutant_bird",
     "dissect": "dissect_bird_sample_single",
     "fear_triggers": [ "PLAYER_CLOSE" ],
-    "special_attacks": [ [ "SHRIEK", 10 ] ],
+    "special_attacks": [ [ "SHRIEK", 10 ], [ "EAT_CARRION", 40 ], [ "EAT_FOOD", 120 ] ],
     "biosignature": { "biosig_item": "feces_bird", "biosig_timer": 8 },
     "upgrades": { "half_life": 21, "into_group": "GROUP_CROW_MUTANT" },
-    "flags": [ "SEES", "HEARS", "SMELLS", "PATH_AVOID_DANGER_1", "WARM", "FLIES" ]
+    "flags": [ "SEES", "HEARS", "SMELLS", "PATH_AVOID_DANGER_1", "WARM", "FLIES", "EATS", "SMALL_HIDER" ]
   },
   {
     "id": "mon_crow_mutant",
@@ -598,49 +643,47 @@
     "melee_dice_sides": 6,
     "melee_damage": [ { "damage_type": "cut", "amount": 3 } ],
     "vision_night": 4,
-    "families": [ "prof_intro_biology", "prof_wp_basic_bird" ],
+    "stomach_size": 800,
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_basic_bird" ],
     "weakpoint_sets": [ "wps_bird_body" ],
     "harvest": "mutant_bird_flightless",
     "dissect": "dissect_bird_sample_small",
     "fear_triggers": [ "FIRE" ],
-    "special_attacks": [ [ "SHRIEK", 10 ], [ "LUNGE", 8 ], { "type": "leap", "cooldown": 10, "max_range": 3 } ],
+    "special_attacks": [
+      [ "SHRIEK", 10 ],
+      [ "LUNGE", 8 ],
+      { "type": "leap", "cooldown": 10, "max_range": 3 },
+      [ "EAT_CARRION", 40 ],
+      [ "EAT_FOOD", 120 ]
+    ],
     "zombify_into": "mon_meat_cocoon_small",
-    "flags": [ "SEES", "HEARS", "SMELLS", "PATH_AVOID_DANGER_1", "STUMBLES", "WARM" ]
+    "flags": [ "SEES", "HEARS", "SMELLS", "PATH_AVOID_DANGER_1", "STUMBLES", "WARM", "EATS" ]
   },
   {
     "id": "mon_pigeon",
     "type": "MONSTER",
-    "name": { "str": "pigeon" },
+    "name": { "str": "feral pigeon" },
     "description": "A gentle, plump, small-billed bird with a skin saddle, or cere, between its bill and forehead.  On the ground, it struts about with a characteristic bobbing of the head.  It is a strong, swift flier thanks to its long wings and powerful flight muscles.",
-    "bodytype": "bird",
-    "default_faction": "small_animal",
-    "categories": [ "WILDLIFE" ],
-    "species": [ "BIRD" ],
-    "volume": "1 L",
-    "weight": "360 g",
-    "hp": 4,
-    "speed": 150,
-    "material": [ "flesh" ],
-    "symbol": "v",
-    "color": "dark_gray",
-    "aggression": -99,
-    "morale": 5,
-    "melee_dice": 1,
-    "melee_dice_sides": 1,
-    "melee_damage": [ { "damage_type": "cut", "amount": 0 } ],
-    "dodge": 4,
-    "families": [ "prof_intro_biology", "prof_wp_flying", "prof_wp_basic_bird" ],
-    "weakpoint_sets": [ "wps_bird_body" ],
-    "harvest": "bird_tiny",
-    "dissect": "dissect_bird_sample_single",
-    "fear_triggers": [ "SOUND", "PLAYER_CLOSE", "FRIEND_ATTACKED", "FRIEND_DIED", "FIRE", "HURT" ],
-    "biosignature": { "biosig_item": "feces_bird", "biosig_timer": 4 },
+    "copy-from": "mon_bird_flying_base",
+    "volume": "467 ml",
+    "weight": "350 g",
+    "reproduction": { "baby_egg": "egg_pigeon", "baby_count": 3, "baby_timer": 32 },
     "petfood": {
       "food": [ "BIRDFOOD" ],
       "feed": "The %s seems to like you!  It runs around your legs and seems friendly.",
       "pet": "The %s runs around your leg."
-    },
-    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES", "SWARMS", "CANPLAY", "CAN_BE_CULLED" ]
+    }
+  },
+  {
+    "id": "mon_pigeon_chick",
+    "type": "MONSTER",
+    "copy-from": "mon_generic_chick",
+    "upgrades": { "age_grow": 16, "into": "mon_pigeon" },
+    "petfood": {
+      "food": [ "BIRDFOOD" ],
+      "feed": "The %s seems to like you!  It runs around your legs and seems friendly.",
+      "pet": "The %s runs around your leg."
+    }
   },
   {
     "id": "mon_goose",
@@ -655,7 +698,7 @@
     "aggression": 1,
     "morale": 15,
     "dodge": 3,
-    "families": [ "prof_intro_biology", "prof_wp_basic_bird" ],
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_basic_bird" ],
     "weakpoint_sets": [ "wps_bird_body" ],
     "melee_damage": [ { "damage_type": "cut", "amount": 2 } ],
     "fear_triggers": [ "FRIEND_ATTACKED", "FRIEND_DIED", "FIRE", "HURT" ],
@@ -667,7 +710,7 @@
       "feed": "The %s seems to like you!  It runs around your legs and seems friendly.",
       "pet": "The %s runs around your leg."
     },
-    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "CAN_BE_CULLED" ]
+    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "CAN_BE_CULLED", "SMALL_HIDER" ]
   },
   {
     "id": "mon_goose_golden",
@@ -719,14 +762,14 @@
     "melee_dice_sides": 1,
     "melee_damage": [ { "damage_type": "cut", "amount": 0 } ],
     "dodge": 4,
-    "families": [ "prof_intro_biology", "prof_wp_flying", "prof_wp_basic_bird" ],
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_flying", "prof_wp_basic_bird" ],
     "weakpoint_sets": [ "wps_bird_body" ],
     "harvest": "bird_tiny",
     "fear_triggers": [ "SOUND", "PLAYER_CLOSE", "FRIEND_ATTACKED", "FRIEND_DIED", "FIRE", "HURT" ],
     "reproduction": { "baby_egg": "egg_hummingbird", "baby_count": 5, "baby_timer": 14 },
     "baby_flags": [ "SPRING" ],
     "biosignature": { "biosig_item": "feces_bird", "biosig_timer": 8 },
-    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES" ]
+    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES", "SMALL_HIDER" ]
   },
   {
     "id": "mon_woodpecker",
@@ -750,20 +793,19 @@
     "melee_dice_sides": 1,
     "melee_damage": [ { "damage_type": "cut", "amount": 0 } ],
     "dodge": 4,
-    "families": [ "prof_intro_biology", "prof_wp_flying", "prof_wp_basic_bird" ],
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_flying", "prof_wp_basic_bird" ],
     "weakpoint_sets": [ "wps_bird_body" ],
     "harvest": "bird_small",
     "fear_triggers": [ "SOUND", "PLAYER_CLOSE", "FRIEND_ATTACKED", "FRIEND_DIED", "FIRE", "HURT" ],
     "reproduction": { "baby_egg": "egg_woodpecker", "baby_count": 5, "baby_timer": 14 },
     "baby_flags": [ "SPRING" ],
     "biosignature": { "biosig_item": "feces_bird", "biosig_timer": 8 },
-    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES" ]
+    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES", "SMALL_HIDER" ]
   },
   {
     "id": "mon_hummingbird_chick",
     "type": "MONSTER",
     "copy-from": "mon_generic_chick",
-    "volume": "80 ml",
     "weight": "7 g",
     "upgrades": { "age_grow": 11, "into": "mon_hummingbird" }
   },
@@ -797,14 +839,14 @@
     "melee_dice_sides": 1,
     "melee_damage": [ { "damage_type": "cut", "amount": 0 } ],
     "dodge": 4,
-    "families": [ "prof_intro_biology", "prof_wp_flying", "prof_wp_basic_bird" ],
+    "families": [ "prof_intro_biology", "prof_physiology", "prof_wp_flying", "prof_wp_basic_bird" ],
     "weakpoint_sets": [ "wps_bird_body" ],
     "harvest": "bird_small",
     "fear_triggers": [ "SOUND", "PLAYER_CLOSE", "FRIEND_ATTACKED", "FRIEND_DIED", "FIRE", "HURT" ],
     "reproduction": { "baby_egg": "egg_coot", "baby_count": 3, "baby_timer": 5 },
     "baby_flags": [ "SPRING" ],
     "biosignature": { "biosig_item": "feces_bird", "biosig_timer": 5 },
-    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES", "SWARMS" ]
+    "flags": [ "SEES", "HEARS", "SMELLS", "ANIMAL", "PATH_AVOID_DANGER_1", "WARM", "FLIES", "SWARMS", "SMALL_HIDER" ]
   },
   {
     "id": "mon_cormorant",

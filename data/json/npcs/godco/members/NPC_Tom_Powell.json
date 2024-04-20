@@ -38,8 +38,11 @@
         "type": "general",
         "context": "meeting",
         "value": "yes",
-        "yes": "Hey, it's you again!  Any news from the outside world?",
-        "no": "Ah, another survivor!  I hope you come in peace.  I'm Tom, nice to meet you."
+        "yes": "Hey, it's you again <u_name>!  Any news from the outside world?",
+        "no": {
+          "gendered_line": "Ah, another survivor!  I hope you come in peace.  I'm Tom, nice to meet you.",
+          "relevant_genders": [ "u" ]
+        }
       }
     },
     "responses": [
@@ -207,7 +210,7 @@
   {
     "type": "talk_topic",
     "id": "TALK_GODCO_Tom_Help",
-    "dynamic_line": "Of course!  Just put all your literary findings on that chair over there.  Remember, you're not only doing a favor for me, but for all of humanity as well.  World heritage is what we're talking about!  I managed to get my hands on a book called 'Zombie Survial Guide' while, uh… dumpster diving.  Imagine how much this book alone reveals about our pre-Cataclysm culture!  Oh boy, how wrong we were about everything.",
+    "dynamic_line": "Of course!  Just put all your literary findings on that chair over there.  Remember, you're not only doing a favor for me, but for all of humanity as well.  World heritage is what we're talking about!  I managed to get my hands on a book called 'Zombie Survival Guide' while, uh… dumpster diving.  Imagine how much this book alone reveals about our pre-Cataclysm culture!  Oh boy, how wrong we were about everything.",
     "responses": [
       { "text": "I mean, can I help with the research?", "topic": "TALK_GODCO_Tom_Research" },
       { "text": "What were you saying before?", "topic": "TALK_NONE" },

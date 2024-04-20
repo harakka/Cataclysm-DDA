@@ -1,12 +1,39 @@
-#include "avatar.h"
 #include "bodygraph.h"
+
+#include <algorithm>
+#include <cstddef>
+#include <initializer_list>
+#include <memory>
+#include <set>
+#include <tuple>
+
 #include "bodypart.h"
+#include "cata_utility.h"
+#include "catacharset.h"
+#include "character.h"
+#include "character_attire.h"
+#include "creature.h"
 #include "cursesdef.h"
 #include "damage.h"
+#include "debug.h"
+#include "enums.h"
+#include "flexbuffer_json-inl.h"
+#include "flexbuffer_json.h"
 #include "generic_factory.h"
-#include "input.h"
+#include "init.h"
+#include "input_context.h"
+#include "json_error.h"
 #include "make_static.h"
+#include "memory_fast.h"
+#include "output.h"
+#include "point.h"
+#include "string_formatter.h"
+#include "subbodypart.h"
+#include "translation.h"
+#include "translations.h"
+#include "ui.h"
 #include "ui_manager.h"
+#include "units.h"
 #include "weather.h"
 
 #define BPGRAPH_MAXROWS 20
@@ -491,7 +518,7 @@ void bodygraph_display::prepare_infotext( bool reset_pos )
     info_txt.emplace_back( string_format( "%s: %d%%", colorize( _( "Wetness" ), c_magenta ),
                                           static_cast<int>( info.wetness * 100.0f ) ) );
     // part temperature
-    const bool temp_precise = u->has_item_with_flag( STATIC( flag_id( "THERMOMETER" ) ) ) ||
+    const bool temp_precise = u->cache_has_item_with( STATIC( flag_id( "THERMOMETER" ) ) ) ||
                               u->has_flag( STATIC( json_character_flag( "THERMOMETER" ) ) );
     const units::temperature temp = units::from_fahrenheit( info.temperature.first / 50.0 );
     info_txt.emplace_back( string_format( "%s: %s", colorize( _( "Body temp" ), c_magenta ),

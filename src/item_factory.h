@@ -50,7 +50,7 @@ class migration
         int charges = 0;
 
         // if set to true then reset item_vars std::map to the value of itype's item_variables
-        bool reset_item_vars;
+        bool reset_item_vars = false;
 
         class content
         {
@@ -166,16 +166,6 @@ class Item_factory
          * Returns the idents of all item groups that are known.
          */
         std::vector<item_group_id> get_all_group_names();
-        /**
-         * Sets the chance of the specified item in the group.
-         * @param group_id Group to add item to
-         * @param item_id Id of item to add to group
-         * @param chance The relative weight of the item. A value of 0 removes the item from the
-         * group.
-         * @return false if the group doesn't exist.
-         */
-        bool add_item_to_group( const item_group_id &, const itype_id &item_id, int chance );
-        /*@}*/
 
         /**
          * @name Item type loading
@@ -233,6 +223,9 @@ class Item_factory
          * @see Item_factory::migrate_id
          */
         void migrate_item( const itype_id &id, item &obj );
+
+        /** applies a migration to the item if one exists with the given from_variant */
+        void migrate_item_from_variant( item &obj, const std::string &from_variant );
 
         /**
          * Check if an item type is known to the Item_factory.
@@ -366,7 +359,6 @@ class Item_factory
         void extend_qualities_from_json( const JsonObject &jo, std::string_view member, itype &def );
         void delete_qualities_from_json( const JsonObject &jo, std::string_view member, itype &def );
         void relative_qualities_from_json( const JsonObject &jo, std::string_view member, itype &def );
-        void set_properties_from_json( const JsonObject &jo, std::string_view member, itype &def );
         void set_techniques_from_json( const JsonObject &jo, const std::string_view &member, itype &def );
         void extend_techniques_from_json( const JsonObject &jo, std::string_view member, itype &def );
         void delete_techniques_from_json( const JsonObject &jo, std::string_view member, itype &def );

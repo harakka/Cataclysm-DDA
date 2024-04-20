@@ -56,14 +56,14 @@
             "npc_need": "hunger",
             "amount": 160,
             "no": {
-              "npc_need": "fatigue",
+              "npc_need": "sleepiness",
               "level": "TIRED",
               "no": {
                 "npc_has_effect": "asked_to_hint",
                 "no": "I have some reason for not telling you.",
                 "yes": "Nothing comes to my mind now.  Ask me later perhaps?"
               },
-              "yes": "I'm too tired, let me rest first."
+              "yes": { "gendered_line": "I'm too tired, let me rest first.", "relevant_genders": [ "npc" ] }
             },
             "yes": "I'm too hungry, give me something to eat."
           },
@@ -81,7 +81,7 @@
       "no": {
         "npc_has_effect": "asked_to_follow",
         "no": "Why should I travel with you?",
-        "yes": "You asked me recently; ask again later."
+        "yes": { "gendered_line": "You asked me recently; ask again later.", "relevant_genders": [ "u" ] }
       },
       "yes": "Not until I get some antibiotics…"
     },
@@ -168,7 +168,7 @@
           ],
           "opinion": { "trust": -4, "fear": 3, "value": -1, "anger": 4 }
         },
-        "failure": { "topic": "TALK_DENY_FOLLOW", "effect": "deny_follow", "opinion": { "trust": 4, "value": -5, "anger": 10 } }
+        "failure": { "topic": "TALK_DENY_FOLLOW", "effect": "deny_follow", "opinion": { "trust": -4, "value": -5, "anger": 20 } }
       },
       { "switch": true, "default": true, "text": "Nevermind.", "topic": "TALK_NONE" }
     ]
@@ -306,14 +306,14 @@
             "npc_need": "hunger",
             "amount": 160,
             "no": {
-              "npc_need": "fatigue",
+              "npc_need": "sleepiness",
               "level": "TIRED",
               "no": {
                 "npc_has_effect": "asked_to_train",
                 "no": "I have some reason for denying you training.",
                 "yes": "Give it some time, I'll show you something new later…"
               },
-              "yes": "I'm too tired, let me rest first."
+              "yes": { "gendered_line": "I'm too tired, let me rest first.", "relevant_genders": [ "npc" ] }
             },
             "yes": "I'm too hungry, give me something to eat."
           },
@@ -337,14 +337,14 @@
             "npc_need": "hunger",
             "amount": 160,
             "no": {
-              "npc_need": "fatigue",
+              "npc_need": "sleepiness",
               "level": "TIRED",
               "no": {
                 "npc_has_effect": "asked_to_train",
                 "no": "I have some reason to refuse hosting a training seminar.",
                 "yes": "Give it some time, we'll talk about a training seminar later…"
               },
-              "yes": "I'm too tired, let me rest first."
+              "yes": { "gendered_line": "I'm too tired, let me rest first.", "relevant_genders": [ "npc" ] }
             },
             "yes": "I'm too hungry, give me something to eat."
           },
@@ -403,8 +403,8 @@
     "id": "TALK_SHARE_EQUIPMENT",
     "type": "talk_topic",
     "dynamic_line": {
-      "npc_has_effect": "infected",
-      "yes": "You just asked me for stuff; ask later.",
+      "npc_has_effect": "asked_for_item",
+      "yes": { "gendered_line": "You just asked me for stuff; ask later.", "relevant_genders": [ "u" ] },
       "no": "Why should I share my equipment with you?"
     },
     "responses": [
@@ -416,7 +416,7 @@
         "default": true,
         "condition": { "u_has_item": "mininuke" },
         "effect": { "give_equipment": { "allowance": [ [ "TRUST", 1 ], [ "VALUE", 3 ], [ "ALTRUISM", 2 ], [ "TOTAL", 300 ] ] } },
-        "opinion": { "value": -1 }
+        "opinion": { "trust": -6, "fear": 5, "value": -1, "anger": 5 }
       },
       {
         "text": "Because I'm your friend!",
@@ -428,7 +428,7 @@
           "effect": { "give_equipment": { "allowance": [ [ "TRUST", 1 ], [ "VALUE", 3 ], [ "ALTRUISM", 2 ], [ "TOTAL", 300 ] ] } },
           "opinion": { "value": -1 }
         },
-        "failure": { "topic": "TALK_DENY_EQUIPMENT", "opinion": { "value": -1 } }
+        "failure": { "topic": "TALK_DENY_EQUIPMENT", "opinion": { "value": -1, "anger": 2 } }
       },
       {
         "text": "Well, I am helping you out…",
@@ -441,7 +441,7 @@
           "mod": [ [ "TRUST", 1 ], [ "VALUE", 2 ], [ "ALTRUISM", 1 ], [ "MISSIONS", 1 ] ]
         },
         "success": { "topic": "TALK_GIVE_EQUIPMENT", "effect": "give_equipment" },
-        "failure": { "topic": "TALK_DENY_EQUIPMENT", "opinion": { "value": -1 } }
+        "failure": { "topic": "TALK_DENY_EQUIPMENT", "opinion": { "value": -1, "anger": 2 } }
       },
       {
         "text": "I'll give it back!",
@@ -453,7 +453,7 @@
           "effect": { "give_equipment": { "allowance": [ [ "TRUST", 1 ], [ "VALUE", 3 ], [ "ALTRUISM", 2 ], [ "TOTAL", 300 ] ] } },
           "opinion": { "value": -1 }
         },
-        "failure": { "topic": "TALK_DENY_EQUIPMENT", "opinion": { "trust": -1, "value": -1 } }
+        "failure": { "topic": "TALK_DENY_EQUIPMENT", "opinion": { "trust": -1, "value": -1, "anger": 2 } }
       },
       {
         "text": "Give it to me, or else!",
@@ -465,11 +465,17 @@
           "effect": {
             "give_equipment": { "allowance": [ [ "U_INTIMIDATE", 1 ], [ "NPC_INTIMIDATE", -1 ], [ "FEAR", 1 ], [ "BRAVERY", -1 ], [ "TOTAL", 500 ] ] }
           },
-          "opinion": { "trust": -3, "fear": 2, "value": -2, "anger": 2 }
+          "opinion": { "trust": -3, "fear": 2, "value": -2, "anger": 3 }
         },
         "failure": { "topic": "TALK_DENY_EQUIPMENT", "opinion": { "trust": -3, "fear": 1, "value": -3, "anger": 5 } }
       },
-      { "text": "Eh, never mind.", "topic": "TALK_NONE" },
+      {
+        "text": "Eh, never mind.",
+        "switch": true,
+        "default": true,
+        "condition": { "npc_has_effect": "asked_for_item" },
+        "topic": "TALK_NONE"
+      },
       { "text": "Never mind, I'll do without.  Bye.", "topic": "TALK_DONE" }
     ]
   },
@@ -478,9 +484,17 @@
     "type": "talk_topic",
     "dynamic_line": "Okay, here you go.",
     "responses": [
-      { "text": "Thank you!", "topic": "TALK_NONE" },
-      { "text": "Thanks!  But can I have some more?", "topic": "TALK_SHARE_EQUIPMENT" },
-      { "text": "Thanks, see you later!", "topic": "TALK_DONE" }
+      { "text": "Thank you!", "topic": "TALK_NONE", "effect": { "npc_add_effect": "asked_for_item", "duration": 86400 } },
+      {
+        "text": "Thanks!  But can I have some more?",
+        "topic": "TALK_SHARE_EQUIPMENT",
+        "effect": { "npc_add_effect": "asked_for_item", "duration": 86400 }
+      },
+      {
+        "text": "Thanks, see you later!",
+        "topic": "TALK_DONE",
+        "effect": { "npc_add_effect": "asked_for_item", "duration": 86400 }
+      }
     ]
   },
   {
@@ -553,7 +567,7 @@
     ]
   },
   {
-    "id": [ "TALK_SIZE_UP", "TALK_LOOK_AT", "TALK_OPINION", "TALK_SHOUT" ],
+    "id": [ "TALK_SIZE_UP", "TALK_ASSESS_PERSON", "TALK_LOOK_AT", "TALK_OPINION", "TALK_SHOUT" ],
     "type": "talk_topic",
     "responses": [ { "text": "Okay.", "topic": "TALK_NONE" } ]
   },

@@ -241,7 +241,7 @@ static void drop_at_feet( Character &you, const std::string &id )
     item *found = retrieve_item( you, id );
     REQUIRE( found );
     item_location loc( you, found );
-    you.moves = 100;
+    you.set_moves( 100 );
     you.drop( loc, you.pos() );
     you.activity.do_turn( you );
 
@@ -256,7 +256,7 @@ static void pick_up_from_feet( Character &you, const std::string &id )
     item *found = retrieve_item( map_cursor( you.pos() ), id );
     REQUIRE( found );
 
-    you.moves = 100;
+    you.set_moves( 100 );
     const std::vector<item_location> target_items = { item_location( map_cursor( you.pos() ), found ) };
     you.assign_activity( pickup_activity_actor( target_items, { 0 }, you.pos(), false ) );
     you.activity.do_turn( you );
@@ -458,7 +458,7 @@ static void invlet_test( avatar &dummy, const inventory_location from, const inv
 
         // remove all items
         dummy.inv->clear();
-        dummy.worn.clear();
+        dummy.clear_worn();
         dummy.remove_weapon();
         get_map().i_clear( dummy.pos() );
         dummy.worn.wear_item( dummy, item( "backpack" ), false, false );
@@ -540,7 +540,7 @@ static void stack_invlet_test( avatar &dummy, inventory_location from, inventory
 
     // remove all items
     dummy.inv->clear();
-    dummy.worn.clear();
+    dummy.clear_worn();
     dummy.remove_weapon();
     get_map().i_clear( dummy.pos() );
     dummy.worn.wear_item( dummy, item( "backpack" ), false, false );
@@ -593,7 +593,7 @@ static void swap_invlet_test( avatar &dummy, inventory_location loc )
 
     // remove all items
     dummy.inv->clear();
-    dummy.worn.clear();
+    dummy.clear_worn();
     dummy.remove_weapon();
     get_map().i_clear( dummy.pos() );
 
@@ -678,7 +678,7 @@ static void merge_invlet_test( avatar &dummy, inventory_location from )
 
         // remove all items
         dummy.inv->clear();
-        dummy.worn.clear();
+        dummy.clear_worn();
         dummy.remove_weapon();
         get_map().i_clear( dummy.pos() );
         dummy.worn.wear_item( dummy, item( "backpack" ), false, false );

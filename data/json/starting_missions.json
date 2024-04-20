@@ -20,7 +20,7 @@
         "place_monster": [
           { "monster": "mon_feral_scientist_scalpel", "name": "The Target", "x": 11, "y": 11, "target": true },
           { "monster": "mon_feral_labsecurity_9mm", "name": "The Guard", "x": 12, "y": 12 },
-          { "monster": "mon_feral_soldier", "name": "The Colaborator", "x": 9, "y": 9 },
+          { "monster": "mon_feral_soldier", "name": "The Collaborator", "x": 9, "y": 9 },
           { "monster": "mon_feral_fancy_rapier", "name": "The Aristocrat", "x": 13, "y": 13 },
           { "monster": "mon_feral_maid_broom", "name": "The Servant", "x": 12, "y": 13 }
         ]
@@ -141,7 +141,7 @@
     "name": { "str": "Life vow" },
     "description": "Live your life to the fullest, prove to yourself that you can survive this new obstacle in the same way that you have survived the last.",
     "goal": "MGOAL_CONDITION",
-    "goal_condition": { "days_since_cataclysm": 7 },
+    "goal_condition": { "math": [ "time_since('cataclysm', 'unit':'days') >= 7" ] },
     "difficulty": 4,
     "value": 0,
     "end": {
@@ -237,6 +237,35 @@
     "goal": "MGOAL_CONDITION",
     "goal_condition": { "u_has_item": "katana" },
     "difficulty": 4,
+    "value": 0,
+    "end": {
+      "effect": [
+        {
+          "u_add_morale": "morale_feeling_good",
+          "bonus": 20,
+          "max_bonus": 50,
+          "duration": "120 minutes",
+          "decay_start": "120 minutes"
+        }
+      ]
+    },
+    "origins": [ "ORIGIN_GAME_START" ]
+  },
+  {
+    "id": "MISSION_FIND_RIFLE",
+    "type": "mission_definition",
+    "name": { "str": "Find a new rifle" },
+    "description": "When you were escaping an evacuation point that was overrun, you had to leave your rifle behind.  Shame on you, what's a hunter without their hunting rifle?  You have to find one immediately.",
+    "goal": "MGOAL_CONDITION",
+    "goal_condition": {
+      "or": [
+        { "u_has_item": "remmington_700" },
+        { "u_has_item": "modular_ar15" },
+        { "u_has_item": "remington700_270" },
+        { "u_has_item": "savage_111f" }
+      ]
+    },
+    "difficulty": 3,
     "value": 0,
     "end": {
       "effect": [
@@ -587,7 +616,7 @@
     "name": { "str": "Ready or Not" },
     "description": "Survive all day from the crazy inhabitants of the mansion.",
     "goal": "MGOAL_CONDITION",
-    "goal_condition": { "days_since_cataclysm": 1 },
+    "goal_condition": { "math": [ "time_since('cataclysm', 'unit':'days') >= 1" ] },
     "difficulty": 3,
     "value": 0,
     "end": {
@@ -692,7 +721,8 @@
   {
     "id": "MISSION_LAST_DELIVERY",
     "type": "mission_definition",
-    "name": { "str": "Reach The Mansion And Finish This Delivery" },
+    "name": { "str": "Deliver Your Cargo" },
+    "description": "You're not sure who orders takeout when the world's ending, but that doesn't matter.  Evacuation doesn't matter.  Nothing, indeed, matters, save for safely delivering your precious cargo to its destination: a remote mansion.",
     "goal": "MGOAL_GO_TO_TYPE",
     "destination": "mansion_c3",
     "difficulty": 1,
