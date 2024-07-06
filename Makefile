@@ -778,7 +778,8 @@ ifeq ($(TILES), 1)
       endif
     endif
   else ifneq ($(NATIVE),emscripten)
-    CXXFLAGS += $(shell $(PKG_CONFIG) --cflags sdl2 SDL2_image SDL2_ttf)
+    CXXFLAGS += $(shell $(PKG_CONFIG) --cflags sdl2)
+    CXXFLAGS += $(shell $(PKG_CONFIG) --cflags SDL2_image SDL2_ttf)
 
     ifeq ($(STATIC), 1)
       LDFLAGS += $(shell $(PKG_CONFIG) sdl2 --static --libs)
