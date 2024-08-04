@@ -3177,6 +3177,10 @@ void target_ui::update_status()
 
 int target_ui::dist_fn( const tripoint &p )
 {
+
+    add_msg( m_warning, string_format( "point 1: %s", src.to_string() ) );
+    add_msg( m_warning, string_format( "point 2: %s", p.to_string() ) );
+
     return static_cast<int>( std::round( rl_dist_exact( src, p ) ) );
 }
 
