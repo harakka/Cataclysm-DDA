@@ -52,7 +52,7 @@ jobs:
           ls -lh
           pwd
           gh release create ${{ steps.vars.outputs.tag_name }} \
-            ../cdda-android-bundle-${{ steps.vars.outputs.timestamp }}-${{ github.sha }}.aab
+            cdda-android-bundle-${{ steps.vars.outputs.timestamp }}-${{ github.sha }}.aab \
             --prerelease \
             --title "${{ steps.vars.outputs.release_name }}" \
             --target "${{ github.sha }}"
