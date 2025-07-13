@@ -13,8 +13,8 @@ jobs:
       - name: Install Dependencies
         uses: awalsh128/cache-apt-pkgs-action@v1
         with:
-          packages: musl python3 python3-pip libvips42 pyvips
-      - run: pip3 install 
+          packages: musl python3 python3-pip libvips42
+      - run: pip3 install pyvips
 
       - name: Clone tileset repo
         uses: actions/checkout@v4
