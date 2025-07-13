@@ -154,9 +154,16 @@ jobs:
         run: |
           git clone --depth=1 --shallow-submodules --recurse-submodules https://github.com/Fris0uman/CDDA-Soundpacks '${{ github.workspace }}/CDDA-Soundpacks'
           mv '${{ github.workspace }}/CDDA-Soundpacks/sound/CC-Sounds' '${{ github.workspace }}/data/sound'
-      - name: Get tilesets
+      - name: Compose tilesets
         if: matrix.tiles == 1
         uses: ./.github/workflows/compose-tilesets.yml
+      - name: Fetch tileset artifact into build
+        if: matrix.tiles == 1
+        uses: actions/download-artifact@v4
+        with:
+          pattern: tileset-*
+          path: gfx
+          merge-multiple: true
       - name: Install dependencies (windows msvc) (0/4)
         if: runner.os == 'Windows'
         uses: lukka/get-cmake@latest

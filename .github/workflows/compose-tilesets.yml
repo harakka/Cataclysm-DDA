@@ -4,28 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  setup:
-    name: install-deps
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Dependencies
-        uses: awalsh128/cache-apt-pkgs-action@v1
-        with:
-          packages: musl python3 python3-pip libvips42
-      - run: pip3 install pyvips
-
-      - name: Clone tileset repo
-        uses: actions/checkout@v4
-        with:
-          repository: I-am-Erk/CDDA-Tilesets
-          ref: master
-          path: build-tilesets
-          fetch-depth: 1
-
   builds:
-    needs: setup
     strategy:
       fail-fast: false
       matrix:
@@ -90,10 +69,27 @@ jobs:
             artifact: PenAndPaper
             tileset_dir: gfx/PenAndPaper
             compose_args: --use-all
-    name: ${{ matrix.name }}
+
+    name: Install dependencies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout local repo
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: musl python3 python3-pip libvips42
+      - run: pip3 install pyvips
+
+      - name: Clone tileset repo
+        uses: actions/checkout@v4
+        with:
+          repository: I-am-Erk/CDDA-Tilesets
+          ref: master
+          path: build-tilesets
+          fetch-depth: 1
+
       - name: Build ${{ matrix.name }}
         run: |
           export SOURCE="build-tilesets/${{ matrix.tileset_dir }}"
@@ -103,3 +99,9 @@ jobs:
           mv "$SOURCE/tileset.txt" "$DEST/"
           [ -f "$SOURCE/fallback.png"  ] && mv "$SOURCE/fallback.png"  "$DEST/"
           [ -f "$SOURCE/layering.json" ] && mv "$SOURCE/layering.json" "$DEST/"
+
+      - name: Store artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: "tileset-${{ matrix.name }}"
+          path: "${{ matrix.tileset_dir }}"
