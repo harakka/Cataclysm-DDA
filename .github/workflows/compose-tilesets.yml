@@ -70,17 +70,23 @@ jobs:
             tileset_dir: gfx/PenAndPaper
             compose_args: --use-all
 
-    name: Install dependencies
+    name: Compose tileset
     runs-on: ubuntu-latest
     steps:
       - name: Checkout local repo
         uses: actions/checkout@v4
+        # with:
+        #     sparse-checkout: |
+        #       tools
+      - name: Build formatter
+        run: make tools/format/json_formatter.cgi
 
       - name: Install dependencies
         uses: awalsh128/cache-apt-pkgs-action@v1
         with:
-          packages: musl python3 python3-pip libvips42
-      - run: pip3 install pyvips
+        #   packages: musl python3 python3-pip libvips42
+          packages: python3 python3-pip libvips42
+      - run: pip install pyvips
 
       - name: Clone tileset repo
         uses: actions/checkout@v4
@@ -88,20 +94,22 @@ jobs:
           repository: I-am-Erk/CDDA-Tilesets
           ref: master
           path: build-tilesets
+          sparse-checkout: gfx
           fetch-depth: 1
 
       - name: Build ${{ matrix.name }}
         run: |
-          export SOURCE="build-tilesets/${{ matrix.tileset_dir }}"
-          export DEST="${{ matrix.tileset_dir }}"
-          python3 ${{ github.workspace }}/tools/gfx_tools/compose.py ${{ matrix.compose_args }} --feedback CONCISE --loglevel INFO --format-json "$SOURCE" "$DEST"
+          set -x
+          export SOURCE="${{github.workspace}}/build-tilesets/${{ matrix.tileset_dir }}"
+          export DEST="${{github.workspace}}/${{ matrix.tileset_dir }}"
+          python3 ${{ github.workspace }}/tools/gfx_tools/compose.py ${{ matrix.compose_args }} --feedback CONCISE --format-json --loglevel INFO "$SOURCE" "$DEST"
 
-          mv "$SOURCE/tileset.txt" "$DEST/"
-          [ -f "$SOURCE/fallback.png"  ] && mv "$SOURCE/fallback.png"  "$DEST/"
-          [ -f "$SOURCE/layering.json" ] && mv "$SOURCE/layering.json" "$DEST/"
+          mv -v "$SOURCE/tileset.txt" "$DEST/"
+          [ -f "$SOURCE/fallback.png"  ] && mv -v "$SOURCE/fallback.png" "$DEST/" || echo "No fallback.png for ${{ matrix.name }}"
+          [ -f "$SOURCE/layering.json" ] && mv -v "$SOURCE/layering.json" "$DEST/" || echo "No layering.json for ${{ matrix.name }}"
 
       - name: Store artifact
         uses: actions/upload-artifact@v4
         with:
           name: "tileset-${{ matrix.name }}"
-          path: "${{ matrix.tileset_dir }}"
+          path: "${{github.workspace}}/gfx/*"
