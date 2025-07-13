@@ -93,6 +93,7 @@ jobs:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Build ${{ matrix.name }}
         run: |
           export SOURCE="build-tilesets/${{ matrix.tileset_dir }}"
