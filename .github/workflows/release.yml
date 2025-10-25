@@ -52,11 +52,14 @@ jobs:
 
   compose-tilesets:
     uses: ./.github/workflows/compose-tilesets.yml
+  build-translations:
+    uses: ./.github/workflows/build-translations.yml
 
   builds:
     needs:
       - release
       - compose-tilesets
+      - build-translations
     strategy:
       fail-fast: false
       matrix:
