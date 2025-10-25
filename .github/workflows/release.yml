@@ -166,6 +166,10 @@ jobs:
           pattern: tileset-*
           path: gfx
           merge-multiple: true
+      - name: Fetch translations artifact into build
+        uses: actions/download-artifact@v4
+        with:
+          name: translations
       - name: Install dependencies (windows msvc) (0/4)
         if: runner.os == 'Windows'
         uses: lukka/get-cmake@latest
