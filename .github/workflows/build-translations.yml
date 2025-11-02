@@ -32,9 +32,6 @@ jobs:
       - name: Discard invalid translations
         run: ./lang/discard_invalid_po.sh
 
-      - name: Compile translations
-        run: lang/compile_mo.sh all
-
       - name: Update translation statistics
         run: ./lang/update_stats.sh
 
@@ -43,5 +40,5 @@ jobs:
         with:
           name: "translations"
           path: |
-            lang/mo
+            lang/po
             src/lang_stats.inc
