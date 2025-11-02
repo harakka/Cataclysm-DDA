@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-translations:
-    if: github.repository == 'CleverRaven/Cataclysm-DDA'
+    # if: github.repository == 'CleverRaven/Cataclysm-DDA'
     runs-on: ubuntu-22.04
     steps:
       - name: Install gettext
@@ -32,6 +32,9 @@ jobs:
       - name: Discard invalid translations
         run: ./lang/discard_invalid_po.sh
 
+      - name: Compile translations
+        run: lang/compile_mo.sh all
+
       - name: Update translation statistics
         run: ./lang/update_stats.sh
 
@@ -40,5 +43,5 @@ jobs:
         with:
           name: "translations"
           path: |
-            lang/po
+            lang/mo
             src/lang_stats.inc
