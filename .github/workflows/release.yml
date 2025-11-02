@@ -178,6 +178,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: translations
+      - name: Rm .po files to make a point
+        run: rm -r lang/po
       - name: Install dependencies (windows msvc) (0/4)
         if: runner.os == 'Windows'
         uses: lukka/get-cmake@latest
