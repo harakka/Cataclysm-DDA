@@ -45,7 +45,7 @@ Migration and obsoletion should happen in `\data\json\obsoletion_and_migration_<
 # Item migration
 
 Any of item types (AMMO, GUN, ARMOR, PET_ARMOR, TOOL, TOOLMOD, TOOL_ARMOR, BOOK, COMESTIBLE, ENGINE, WHEEL, GUNMOD, MAGAZINE, GENERIC, BIONIC_ITEM) should be migrated to another item, then it can be removed with no issues
-AMMO and COMESTIBLE types require additional handling, explained in [Charge and temperature removal](#Charge_and_temperature_removal)
+AMMO and COMESTIBLE types require additional handling, explained in [Charge and temperature removal](#Charge-and-temperature-removal)
 
 ```jsonc
 {
@@ -176,6 +176,22 @@ Prof migration can be migrated to new prof (with progress being transferred) or 
     "type": "proficiency_migration",
     "from": "prof_wp_slime_advanced"
   }
+```
+
+# Spell migration
+
+The only spells that require migration are one that are actual spells that character/player learned, so this section is more applicable to magic mods, and not applicable to, for example, a monster spells (monsters do not store it anywhere, just picking it up fron definition when needed)
+
+```jsonc
+  {
+    "type": "spell_migration",
+    "from": "spell_foo",  // Mandatory. Id of the spell that has been removed.
+    "to": "spell_bar"     // Optional. Id of the new spell that will be set instead. Can be omitted to remove the spell completely. If character already has this spell learned, it will not be modified
+  },
+  {
+    "type": "spell_migration",
+    "from": "spell_bar",
+  },
 ```
 
 # Monster migration

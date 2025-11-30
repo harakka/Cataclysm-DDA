@@ -2235,8 +2235,19 @@ void move_items_activity_actor::do_turn( player_activity &act, Character &who )
         // Make a copy to be put in the destination location
         item newit = leftovers;
 
-        if( newit.is_owned_by( who, true ) ) {
-            newit.set_owner( who );
+        Character &player_character = get_player_character();
+
+        if( newit.is_owned_by( who, true ) ||
+            ( who.getID() == player_character.getID() &&
+              player_character.get_value( "THIEF_MODE" ).str() == "THIEF_STEAL" ) ) {
+            // There are two distinct reasons we could get here:
+            //
+            //  1. This item was already owned by our 'who' at top level.
+            //  2. This item is NOT owned by 'who,' but 'who' is a player character with a THIEF_STEAL preference.
+            //     By setting the preference, the player is explicitly telling us to steal it, so we do.
+            //
+            // Either way, handle_pickup_ownership() will do the right thing.
+            newit.handle_pickup_ownership( who );
         } else {
             continue;
         }
@@ -8337,8 +8348,7 @@ void heat_activity_actor::finish( player_activity &act, Character &p )
         if( cold_item->count_by_charges() ) {
             item copy( *cold_item );
             copy.charges = ait.second;
-            copy.unset_flag( flag_FROZEN );
-            copy.set_flag( flag_HOT );
+            copy.heat_up();
             cold_item->charges -= ait.second;
             if( cold_item->charges <= 0 ) {
                 cold_item.remove_item();
@@ -8349,8 +8359,7 @@ void heat_activity_actor::finish( player_activity &act, Character &p )
                 p.i_add_or_drop( copy );
             }
         } else {
-            cold_item->unset_flag( flag_FROZEN );
-            cold_item->set_flag( flag_HOT );
+            cold_item->heat_up();
             if( cold_item.get_item()->made_of( phase_id::LIQUID ) ) {
                 liquid_handler::handle_all_liquid( *cold_item, PICKUP_RANGE );
             } else {
@@ -9194,7 +9203,7 @@ bool zone_sort_activity_actor::stage_think( player_activity &act, Character &you
     // iterate over zone positions and look for items to move
     for( const tripoint_abs_ms &src : src_sorted ) {
         placement = src;
-        src_set.erase( src );
+        coord_set.erase( src );
 
         const tripoint_bub_ms src_bub = here.get_bub( src );
         if( !here.inbounds( src_bub ) ) {
