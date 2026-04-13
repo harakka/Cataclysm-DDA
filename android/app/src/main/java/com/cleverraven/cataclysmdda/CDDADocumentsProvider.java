@@ -9,19 +9,26 @@ import android.os.CancellationSignal;
 import android.os.ParcelFileDescriptor;
 import android.provider.DocumentsProvider;
 import android.provider.DocumentsContract;
-import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+/**
+ * DocumentsProvider for Cataclysm: Dark Days Ahead.
+ * Exposes the app's external private data directory (/storage/emulated/0/Android/data/package/)
+ * so that users can back up saves, mods, and configs without root access.
+ * <p>
+ * Root document ID is "root" (non-empty) for compatibility with third-party file managers.
+ * The provider requires the app process to have been started at least once; after that,
+ * file managers can access the data as long as the process is alive.
+ */
 @TargetApi(Build.VERSION_CODES.KITKAT)
 public class CDDADocumentsProvider extends DocumentsProvider {
 
-    private static final String TAG = "CDDADocumentsProvider";
+    // Root document ID - using a non-empty string for better compatibility with various file managers.
     private static final String ROOT_DOCUMENT_ID = "root";
-
     private File externalDataRoot;
 
     @Override
@@ -36,36 +43,24 @@ public class CDDADocumentsProvider extends DocumentsProvider {
         return true;
     }
 
-    private void ensureExternalDataRoot() throws FileNotFoundException {
-        if (externalDataRoot == null) {
-            Context context = getContext();
-            if (context != null) {
-                File externalFilesDir = context.getExternalFilesDir(null);
-                if (externalFilesDir != null) {
-                    externalDataRoot = externalFilesDir.getParentFile();
-                }
-            }
-        }
-        if (externalDataRoot == null) {
+    private void ensureRoot() throws FileNotFoundException {
+        if (externalDataRoot == null || !externalDataRoot.exists()) {
             throw new FileNotFoundException("External data root not accessible");
         }
     }
 
+    /**
+     * Resolves a document ID to an absolute File object.
+     * Document IDs are relative paths under the root, except the root itself which is "root".
+     * Security: prevents path traversal by comparing canonical paths.
+     */
     private File getFileForDocId(String docId) throws FileNotFoundException {
-        ensureExternalDataRoot();
-        // Some file managers (e.g., MT Manager) incorrectly prepend "root/" to document IDs.
-        if (docId != null && docId.startsWith(ROOT_DOCUMENT_ID + "/")) {
-            docId = docId.substring(ROOT_DOCUMENT_ID.length() + 1);
-        }
+        ensureRoot();
         File target;
         if (ROOT_DOCUMENT_ID.equals(docId) || docId == null || docId.isEmpty()) {
             target = externalDataRoot;
         } else {
-            String relativePath = docId;
-            if (relativePath.startsWith("/")) {
-                relativePath = relativePath.substring(1);
-            }
-            target = new File(externalDataRoot, relativePath);
+            target = new File(externalDataRoot, docId);
         }
         try {
             String canonicalTarget = target.getCanonicalPath();
@@ -83,35 +78,15 @@ public class CDDADocumentsProvider extends DocumentsProvider {
     }
 
     @Override
-    public boolean isChildDocument(String parentDocId, String docId) {
-        // Normalize IDs that may have "root/" prefix.
-        if (docId != null && docId.startsWith(ROOT_DOCUMENT_ID + "/")) {
-            docId = docId.substring(ROOT_DOCUMENT_ID.length() + 1);
-        }
-        if (parentDocId != null && parentDocId.startsWith(ROOT_DOCUMENT_ID + "/")) {
-            parentDocId = parentDocId.substring(ROOT_DOCUMENT_ID.length() + 1);
-        }
-        if (ROOT_DOCUMENT_ID.equals(parentDocId)) {
-            return true;
-        }
-        if (parentDocId == null || docId == null) {
-            return false;
-        }
-        if (docId.equals(parentDocId)) {
-            return true;
-        }
-        return docId.startsWith(parentDocId + "/");
-    }
-
-    @Override
     public Cursor queryRoots(String[] projection) {
         try {
-            ensureExternalDataRoot();
+            ensureRoot();
         } catch (FileNotFoundException e) {
             String[] fallback = (projection != null) ? projection : new String[]{DocumentsContract.Root.COLUMN_ROOT_ID};
             return new MatrixCursor(fallback);
         }
 
+        // Define all possible columns (some may be omitted by the caller's projection)
         String[] allColumns = {
                 DocumentsContract.Root.COLUMN_ROOT_ID,
                 DocumentsContract.Root.COLUMN_TITLE,
@@ -124,33 +99,32 @@ public class CDDADocumentsProvider extends DocumentsProvider {
         String[] finalProjection = (projection != null) ? projection : allColumns;
         MatrixCursor result = new MatrixCursor(finalProjection);
 
-        if (externalDataRoot != null && externalDataRoot.exists()) {
-            Object[] rowValues = new Object[finalProjection.length];
-            for (int i = 0; i < finalProjection.length; i++) {
-                String col = finalProjection[i];
-                if (DocumentsContract.Root.COLUMN_ROOT_ID.equals(col)) {
-                    rowValues[i] = "external";
-                } else if (DocumentsContract.Root.COLUMN_TITLE.equals(col)) {
-                    rowValues[i] = "CDDA Game Data";
-                } else if (DocumentsContract.Root.COLUMN_FLAGS.equals(col)) {
-                    int flags = DocumentsContract.Root.FLAG_SUPPORTS_CREATE |
-                                DocumentsContract.Root.FLAG_LOCAL_ONLY |
-                                DocumentsContract.Root.FLAG_SUPPORTS_IS_CHILD;
-                    rowValues[i] = flags;
-                } else if (DocumentsContract.Root.COLUMN_DOCUMENT_ID.equals(col)) {
-                    rowValues[i] = ROOT_DOCUMENT_ID;
-                } else if (DocumentsContract.Root.COLUMN_ICON.equals(col)) {
-                    rowValues[i] = R.drawable.ic_launcher;
-                } else if (DocumentsContract.Root.COLUMN_AVAILABLE_BYTES.equals(col)) {
-                    rowValues[i] = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) ? externalDataRoot.getFreeSpace() : 0L;
-                } else if (DocumentsContract.Root.COLUMN_CAPACITY_BYTES.equals(col)) {
-                    rowValues[i] = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) ? externalDataRoot.getTotalSpace() : 0L;
-                } else {
-                    rowValues[i] = null;
-                }
+        Object[] rowValues = new Object[finalProjection.length];
+        for (int i = 0; i < finalProjection.length; i++) {
+            String col = finalProjection[i];
+            if (DocumentsContract.Root.COLUMN_ROOT_ID.equals(col)) {
+                rowValues[i] = "external";
+            } else if (DocumentsContract.Root.COLUMN_TITLE.equals(col)) {
+                rowValues[i] = "CDDA Game Data";
+            } else if (DocumentsContract.Root.COLUMN_FLAGS.equals(col)) {
+                int flags = DocumentsContract.Root.FLAG_SUPPORTS_CREATE |
+                            DocumentsContract.Root.FLAG_LOCAL_ONLY |
+                            DocumentsContract.Root.FLAG_SUPPORTS_IS_CHILD;
+                rowValues[i] = flags;
+            } else if (DocumentsContract.Root.COLUMN_DOCUMENT_ID.equals(col)) {
+                rowValues[i] = ROOT_DOCUMENT_ID;
+            } else if (DocumentsContract.Root.COLUMN_ICON.equals(col)) {
+                rowValues[i] = R.drawable.ic_launcher;
+            } else if (DocumentsContract.Root.COLUMN_AVAILABLE_BYTES.equals(col)) {
+                // Available on API 23+
+                rowValues[i] = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) ? externalDataRoot.getFreeSpace() : 0L;
+            } else if (DocumentsContract.Root.COLUMN_CAPACITY_BYTES.equals(col)) {
+                rowValues[i] = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) ? externalDataRoot.getTotalSpace() : 0L;
+            } else {
+                rowValues[i] = null;
             }
-            result.addRow(rowValues);
         }
+        result.addRow(rowValues);
         return result;
     }
 
@@ -235,6 +209,18 @@ public class CDDADocumentsProvider extends DocumentsProvider {
             }
         }
         file.delete();
+    }
+
+    /**
+     * Checks whether a document is a descendant of a parent document.
+     * Root is considered the parent of all documents.
+     */
+    @Override
+    public boolean isChildDocument(String parentDocId, String docId) {
+        if (parentDocId == null || docId == null) return false;
+        if (ROOT_DOCUMENT_ID.equals(parentDocId)) return true;
+        if (docId.equals(parentDocId)) return true;
+        return docId.startsWith(parentDocId + "/");
     }
 
     private void addDocumentRow(MatrixCursor cursor, String[] columns, File file, String documentId) {
